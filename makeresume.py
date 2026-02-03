@@ -128,9 +128,9 @@ story = []
 
 story.append(StyledName("Shea Smith"))
 
-story.append(StyledContactInfo("sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL"))
+story.extend(StyledContactInfo("sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL"))
 
-story.append(StyledSectionHeader("Education"))
+story.extend(StyledSectionHeader("Education"))
 
 story.append(StyledJobHeader(
     title="Northwestern University",
@@ -139,7 +139,7 @@ story.append(StyledJobHeader(
     location="Evanston, IL"
 ))
 
-story.append(StyledSectionHeader("Experience"))
+story.extend(StyledSectionHeader("Experience"))
 
 story.append(StyledJobHeader(
     title="Beta Technologies",

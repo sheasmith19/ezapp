@@ -229,7 +229,7 @@
         "kind": 5,
         "importPath": "makeresume",
         "description": "makeresume",
-        "peekOfCode": "story = []\nstory.append(StyledName(\"Shea Smith\"))\nstory.append(StyledContactInfo(\"sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL\"))\nstory.append(StyledSectionHeader(\"Education\"))\nstory.append(StyledJobHeader(\n    title=\"Northwestern University\",\n    meta=\"ANTICIPATED 2028, BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION) | 3.95 GPA\",\n    date=\"Anticipated June 2028\",\n    location=\"Evanston, IL\"\n))",
+        "peekOfCode": "story = []\nstory.append(StyledName(\"Shea Smith\"))\nstory.extend(StyledContactInfo(\"sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL\"))\nstory.extend(StyledSectionHeader(\"Education\"))\nstory.append(StyledJobHeader(\n    title=\"Northwestern University\",\n    meta=\"ANTICIPATED 2028, BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION) | 3.95 GPA\",\n    date=\"Anticipated June 2028\",\n    location=\"Evanston, IL\"\n))",
         "detail": "makeresume",
         "documentation": {}
     },
