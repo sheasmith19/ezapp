@@ -1,0 +1,281 @@
+[
+    {
+        "label": "black",
+        "importPath": "reportlab.lib.colors",
+        "description": "reportlab.lib.colors",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.colors",
+        "documentation": {}
+    },
+    {
+        "label": "grey",
+        "importPath": "reportlab.lib.colors",
+        "description": "reportlab.lib.colors",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.colors",
+        "documentation": {}
+    },
+    {
+        "label": "TA_LEFT",
+        "importPath": "reportlab.lib.enums",
+        "description": "reportlab.lib.enums",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.enums",
+        "documentation": {}
+    },
+    {
+        "label": "TA_RIGHT",
+        "importPath": "reportlab.lib.enums",
+        "description": "reportlab.lib.enums",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.enums",
+        "documentation": {}
+    },
+    {
+        "label": "LETTER",
+        "importPath": "reportlab.lib.pagesizes",
+        "description": "reportlab.lib.pagesizes",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.pagesizes",
+        "documentation": {}
+    },
+    {
+        "label": "LETTER",
+        "importPath": "reportlab.lib.pagesizes",
+        "description": "reportlab.lib.pagesizes",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.pagesizes",
+        "documentation": {}
+    },
+    {
+        "label": "ParagraphStyle",
+        "importPath": "reportlab.lib.styles",
+        "description": "reportlab.lib.styles",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.styles",
+        "documentation": {}
+    },
+    {
+        "label": "getSampleStyleSheet",
+        "importPath": "reportlab.lib.styles",
+        "description": "reportlab.lib.styles",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.styles",
+        "documentation": {}
+    },
+    {
+        "label": "inch",
+        "importPath": "reportlab.lib.units",
+        "description": "reportlab.lib.units",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.units",
+        "documentation": {}
+    },
+    {
+        "label": "inch",
+        "importPath": "reportlab.lib.units",
+        "description": "reportlab.lib.units",
+        "isExtraImport": true,
+        "detail": "reportlab.lib.units",
+        "documentation": {}
+    },
+    {
+        "label": "HRFlowable",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "ListFlowable",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "Paragraph",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "SimpleDocTemplate",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "Spacer",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "Table",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "TableStyle",
+        "importPath": "reportlab.platypus",
+        "description": "reportlab.platypus",
+        "isExtraImport": true,
+        "detail": "reportlab.platypus",
+        "documentation": {}
+    },
+    {
+        "label": "pdfplumber",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pdfplumber",
+        "description": "pdfplumber",
+        "detail": "pdfplumber",
+        "documentation": {}
+    },
+    {
+        "label": "canvas",
+        "importPath": "reportlab.pdfgen",
+        "description": "reportlab.pdfgen",
+        "isExtraImport": true,
+        "detail": "reportlab.pdfgen",
+        "documentation": {}
+    },
+    {
+        "label": "StyledName",
+        "kind": 2,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(text: str):\n    return [Paragraph(text, styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "StyledContactInfo",
+        "kind": 2,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "def StyledContactInfo(text: str):\n    return [Paragraph(text, styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "StyledSectionHeader",
+        "kind": 2,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "def StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,\n                spaceAfter=8,\n            )\n    ]",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "StyledJobHeader",
+        "kind": 2,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "def StyledJobHeader(title: str, meta: str, date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{title}</b>\", styles[\"JobTitle\"]), Paragraph(meta, styles[\"JobMeta\"])],\n                Paragraph(f\"{date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "StyledResponsibility",
+        "kind": 2,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "def StyledResponsibility(text: str):\n    return ListFlowable(\n            [\n                Paragraph(\n                    text,\n                    styles[\"Body\"],\n                )\n            ],\n            bulletType=\"bullet\",\n            bulletFontName=\"Helvetica\",",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "styles",
+        "kind": 5,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "styles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Times\",\n    fontSize=18,\n    spaceAfter=12,\n))\nstyles.add(ParagraphStyle(\n    name=\"SectionHeader\",\n    fontName=\"Times\",",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "JOB_HEADER_TABLE_STYLE",
+        "kind": 5,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "JOB_HEADER_TABLE_STYLE = (TableStyle(\n    [(\"VALIGN\", (0, 0), (-1, -1), \"TOP\"),\n     (\"LEFTPADDING\", (0, 0), (-1, -1), 0),\n     (\"RIGHTPADDING\", (0, 0), (-1, -1), 0),\n     (\"TOPPADDING\", (0, 0), (-1, -1), 0),\n     (\"BOTTOMPADDING\", (0, 0), (-1, -1), 2),\n    ]))\ndoc = SimpleDocTemplate(\n    \"resume.pdf\",\n    pagesize=LETTER,",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "doc",
+        "kind": 5,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "doc = SimpleDocTemplate(\n    \"resume.pdf\",\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\ndef StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "story",
+        "kind": 5,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "story = []\nstory.append(StyledName(\"Shea Smith\"))\nstory.append(StyledContactInfo(\"sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL\"))\nstory.append(StyledSectionHeader(\"Education\"))\nstory.append(StyledJobHeader(\n    title=\"Northwestern University\",\n    meta=\"ANTICIPATED 2028, BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION) | 3.95 GPA\",\n    date=\"Anticipated June 2028\",\n    location=\"Evanston, IL\"\n))",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "extract_pages",
+        "kind": 2,
+        "importPath": "parsepdf",
+        "description": "parsepdf",
+        "peekOfCode": "def extract_pages(pdf_path):\n    pages_text = []\n    with pdfplumber.open(pdf_path) as pdf:\n        for page in pdf.pages:\n            text = page.extract_text()\n            pages_text.append(text or \"\")\n    return pages_text\nfrom reportlab.lib.pagesizes import LETTER\nfrom reportlab.pdfgen import canvas\nfrom reportlab.lib.units import inch",
+        "detail": "parsepdf",
+        "documentation": {}
+    },
+    {
+        "label": "rebuild_pdf",
+        "kind": 2,
+        "importPath": "parsepdf",
+        "description": "parsepdf",
+        "peekOfCode": "def rebuild_pdf(pages_text, output_path):\n    c = canvas.Canvas(output_path, pagesize=LETTER)\n    width, height = LETTER\n    for page_text in pages_text:\n        text_obj = c.beginText()\n        text_obj.setTextOrigin(1 * inch, height - 1 * inch)\n        text_obj.setFont(\"Helvetica\", 11)\n        for line in page_text.split(\"\\n\"):\n            text_obj.textLine(line)\n        c.drawText(text_obj)",
+        "detail": "parsepdf",
+        "documentation": {}
+    },
+    {
+        "label": "input_pdf",
+        "kind": 5,
+        "importPath": "parsepdf",
+        "description": "parsepdf",
+        "peekOfCode": "input_pdf = \"A-resume.pdf\"\noutput_pdf = \"output.pdf\"\npages = extract_pages(input_pdf)\nrebuild_pdf(pages, output_pdf)",
+        "detail": "parsepdf",
+        "documentation": {}
+    },
+    {
+        "label": "output_pdf",
+        "kind": 5,
+        "importPath": "parsepdf",
+        "description": "parsepdf",
+        "peekOfCode": "output_pdf = \"output.pdf\"\npages = extract_pages(input_pdf)\nrebuild_pdf(pages, output_pdf)",
+        "detail": "parsepdf",
+        "documentation": {}
+    },
+    {
+        "label": "pages",
+        "kind": 5,
+        "importPath": "parsepdf",
+        "description": "parsepdf",
+        "peekOfCode": "pages = extract_pages(input_pdf)\nrebuild_pdf(pages, output_pdf)",
+        "detail": "parsepdf",
+        "documentation": {}
+    }
+]
