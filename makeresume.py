@@ -94,7 +94,7 @@ def StyledSectionHeader(text: str):
                 thickness=0.75,
                 color="#999999",
                 spaceBefore=0,
-                spaceAfter=8,
+                spaceAfter=0,
             )
     ]
 
@@ -109,7 +109,21 @@ def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, loca
         colWidths=[None, 1.25 * inch],
     )
     header.setStyle(JOB_HEADER_TABLE_STYLE)
-    return header
+    return [Spacer(1, 8), header]
+
+def StyledJobHeader(company: str, location: str, duration: str, position: str):
+    header = Table(
+        [
+            [
+                [Paragraph(f"<b>{company}</b>", styles["JobTitle"]), Paragraph(position, styles["JobMeta"])],
+                Paragraph(f"{duration}<br/>{location}", styles["DateLocation"]),
+            ]
+        ],
+        colWidths=[None, 1.25 * inch],
+    )
+    header.setStyle(JOB_HEADER_TABLE_STYLE)
+    return [Spacer(1, 8), header]
+    
     
 def StyledResponsibility(text: str):
     return ListFlowable(
@@ -124,37 +138,6 @@ def StyledResponsibility(text: str):
             bulletFontSize=14,   # 👈 smaller bullet
             leftIndent=12,     # controls hanging indent
         )
-
-story = []
-
-story.append(StyledName("Shea Smith"))
-
-story.extend(StyledContactInfo("sheamcabesmith@gmail.com", "+1 (802) 999-5285", "Evanston, IL"))
-
-story.extend(StyledSectionHeader("Education"))
-
-story.append(StyledEduHeader(
-    name="Northwestern University",
-    degree="BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION)A",
-    gpa="3.95",
-    graduation_date="June 2028",
-    location="Evanston, IL"
-))
-
-story.extend(StyledSectionHeader("Experience"))
-
-story.append(StyledJobHeader(
-    company="Beta Technologies",
-    meta="2021 – Present · Remote",
-    date="July 2024 – Present",
-    location="Burlington, VT"
-))
-
-story.append(StyledResponsibility(
-    "Collaborate with a team of engineers to design and implement autonomous systems for electric vertical takeoff and landing (eVTOL) aircraft."
-))
-
-doc.build(story)
 
 def BuildFromXML(xml_path: str, output_path: str):
     doc = SimpleDocTemplate(
@@ -186,19 +169,20 @@ def BuildFromXML(xml_path: str, output_path: str):
                 gpa = institution.find("gpa").text
                 graduation_date = institution.find("graduation_date").text
                 location = institution.find("location").text
-                story.append(StyledEduHeader(name, degree, gpa, graduation_date, location))
+                story.extend(StyledEduHeader(name, degree, gpa, graduation_date, location))
         elif child.tag == "experience":
+            story.extend(StyledSectionHeader("Experience"))
             for job in child.findall("job"):
-                story.extend(StyledSectionHeader("Experience"))
-                title = job.find("title").text
-                meta = job.find("meta").text
-                date = job.find("date").text
+                company = job.find("company").text
                 location = job.find("location").text
-                story.append(StyledJobHeader(title, meta, date, location))
+                duration = job.find("duration").text
+                position = job.find("position").text
+                story.extend(StyledJobHeader(company, location, duration, position))
                 responsibilities = job.find("responsibilities")
                 for resp in responsibilities.findall("responsibility"):
                     story.append(StyledResponsibility(resp.text))
-            
-            
-            # Further processing would go here
+    
+    doc.build(story)
+    
+BuildFromXML("resume.xml", "resume_from_xml.pdf")
             
