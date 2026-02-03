@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resume>
+    <personal_info>
+        <name>Shea Smith</name>
+        <contact>
+            <email>sheamcabesmith@gmail.com</email>
+            <phone>+1 (802) 999-5285</phone>
+            <location>Evanston, IL</location>
+        </contact>
+    </personal_info>
+    <education>
+        <institution>
+            <name>Northwestern University</name>
+            <degree>BS in Mechanical Engineering (Robotics Concentration)</degree>
+            <gpa>3.95</gpa>
+            <graduation_date>Anticipated June 2028</graduation_date>
+            <location>Evanston, IL</location>
+        </institution>
+    </education>
+    <experience>
+        <job>
+            <company>Beta Technologies</company>
+            <location>Burlington, VT</location>
+            <duration>July 2024 – Present</duration>
+            <position>Second Year Intern, Composites Team</position>
+            <responsibilities>
+                <responsibility>Identified bottleneck in MFG engineering workflow where labels are fitted onto ply shapes by hand, created
+polygon nesting script to automate label placement, integrated script into shop’s production software stack
+saving hours on each build package</responsibility>
+                <responsibility>Designed first production composite tool, pioneering company goal of in-house composite tooling</responsibility>
+            </responsibilities>
+        </job>
+    </experience>
+</resume>

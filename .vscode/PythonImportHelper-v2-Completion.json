@@ -136,6 +136,15 @@
         "documentation": {}
     },
     {
+        "label": "xml.etree.ElementTree",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "xml.etree.ElementTree",
+        "description": "xml.etree.ElementTree",
+        "detail": "xml.etree.ElementTree",
+        "documentation": {}
+    },
+    {
         "label": "pdfplumber",
         "kind": 6,
         "isExtraImport": true,
@@ -157,7 +166,7 @@
         "kind": 2,
         "importPath": "makeresume",
         "description": "makeresume",
-        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(text: str):\n    return [Paragraph(text, styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,",
+        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(email: str, phone: str, location: str):\n    return [Paragraph(f\"{email} | {phone} | {location}\", styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,",
         "detail": "makeresume",
         "documentation": {}
     },
@@ -166,7 +175,7 @@
         "kind": 2,
         "importPath": "makeresume",
         "description": "makeresume",
-        "peekOfCode": "def StyledContactInfo(text: str):\n    return [Paragraph(text, styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,",
+        "peekOfCode": "def StyledContactInfo(email: str, phone: str, location: str):\n    return [Paragraph(f\"{email} | {phone} | {location}\", styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,",
         "detail": "makeresume",
         "documentation": {}
     },
@@ -180,11 +189,11 @@
         "documentation": {}
     },
     {
-        "label": "StyledJobHeader",
+        "label": "StyledEduHeader",
         "kind": 2,
         "importPath": "makeresume",
         "description": "makeresume",
-        "peekOfCode": "def StyledJobHeader(title: str, meta: str, date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{title}</b>\", styles[\"JobTitle\"]), Paragraph(meta, styles[\"JobMeta\"])],\n                Paragraph(f\"{date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
+        "peekOfCode": "def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{name}</b>\", styles[\"JobTitle\"]), Paragraph(f\"{degree} | GPA: {gpa}\", styles[\"JobMeta\"])],\n                Paragraph(f\"{graduation_date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
         "detail": "makeresume",
         "documentation": {}
     },
@@ -194,6 +203,15 @@
         "importPath": "makeresume",
         "description": "makeresume",
         "peekOfCode": "def StyledResponsibility(text: str):\n    return ListFlowable(\n            [\n                Paragraph(\n                    text,\n                    styles[\"Body\"],\n                )\n            ],\n            bulletType=\"bullet\",\n            bulletFontName=\"Helvetica\",",
+        "detail": "makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "BuildFromXML",
+        "kind": 2,
+        "importPath": "makeresume",
+        "description": "makeresume",
+        "peekOfCode": "def BuildFromXML(xml_path: str, output_path: str):\n    doc = SimpleDocTemplate(\n    output_path,\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\n    story = []",
         "detail": "makeresume",
         "documentation": {}
     },
@@ -229,7 +247,7 @@
         "kind": 5,
         "importPath": "makeresume",
         "description": "makeresume",
-        "peekOfCode": "story = []\nstory.append(StyledName(\"Shea Smith\"))\nstory.extend(StyledContactInfo(\"sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL\"))\nstory.extend(StyledSectionHeader(\"Education\"))\nstory.append(StyledJobHeader(\n    title=\"Northwestern University\",\n    meta=\"ANTICIPATED 2028, BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION) | 3.95 GPA\",\n    date=\"Anticipated June 2028\",\n    location=\"Evanston, IL\"\n))",
+        "peekOfCode": "story = []\nstory.append(StyledName(\"Shea Smith\"))\nstory.extend(StyledContactInfo(\"sheamcabesmith@gmail.com\", \"+1 (802) 999-5285\", \"Evanston, IL\"))\nstory.extend(StyledSectionHeader(\"Education\"))\nstory.append(StyledEduHeader(\n    name=\"Northwestern University\",\n    degree=\"BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION)A\",\n    gpa=\"3.95\",\n    graduation_date=\"June 2028\",\n    location=\"Evanston, IL\"",
         "detail": "makeresume",
         "documentation": {}
     },

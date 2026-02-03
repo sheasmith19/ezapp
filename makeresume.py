@@ -5,6 +5,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import inch
 from reportlab.platypus import (HRFlowable, ListFlowable, Paragraph,
                                 SimpleDocTemplate, Spacer, Table, TableStyle)
+import xml.etree.ElementTree as ET
 
 styles = getSampleStyleSheet()
 
@@ -82,8 +83,8 @@ doc = SimpleDocTemplate(
 def StyledName(text: str):
     return Paragraph(text, styles["Name"])
 
-def StyledContactInfo(text: str):
-    return [Paragraph(text, styles['Body']), 
+def StyledContactInfo(email: str, phone: str, location: str):
+    return [Paragraph(f"{email} | {phone} | {location}", styles['Body']), 
             Spacer(1, 8)]
 
 def StyledSectionHeader(text: str):
@@ -97,12 +98,12 @@ def StyledSectionHeader(text: str):
             )
     ]
 
-def StyledJobHeader(title: str, meta: str, date: str, location: str):
+def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, location: str):
     header = Table(
         [
             [
-                [Paragraph(f"<b>{title}</b>", styles["JobTitle"]), Paragraph(meta, styles["JobMeta"])],
-                Paragraph(f"{date}<br/>{location}", styles["DateLocation"]),
+                [Paragraph(f"<b>{name}</b>", styles["JobTitle"]), Paragraph(f"{degree} | GPA: {gpa}", styles["JobMeta"])],
+                Paragraph(f"{graduation_date}<br/>{location}", styles["DateLocation"]),
             ]
         ],
         colWidths=[None, 1.25 * inch],
@@ -128,21 +129,22 @@ story = []
 
 story.append(StyledName("Shea Smith"))
 
-story.extend(StyledContactInfo("sheamcabesmith@gmail.com | +1 (802) 999-5285 | Evanston, IL"))
+story.extend(StyledContactInfo("sheamcabesmith@gmail.com", "+1 (802) 999-5285", "Evanston, IL"))
 
 story.extend(StyledSectionHeader("Education"))
 
-story.append(StyledJobHeader(
-    title="Northwestern University",
-    meta="ANTICIPATED 2028, BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION) | 3.95 GPA",
-    date="Anticipated June 2028",
+story.append(StyledEduHeader(
+    name="Northwestern University",
+    degree="BS IN MECHANICAL ENGINEERING (ROBOTICS CONCENTRATION)A",
+    gpa="3.95",
+    graduation_date="June 2028",
     location="Evanston, IL"
 ))
 
 story.extend(StyledSectionHeader("Experience"))
 
 story.append(StyledJobHeader(
-    title="Beta Technologies",
+    company="Beta Technologies",
     meta="2021 – Present · Remote",
     date="July 2024 – Present",
     location="Burlington, VT"
@@ -153,3 +155,50 @@ story.append(StyledResponsibility(
 ))
 
 doc.build(story)
+
+def BuildFromXML(xml_path: str, output_path: str):
+    doc = SimpleDocTemplate(
+    output_path,
+    pagesize=LETTER,
+    rightMargin=0.75 * inch,
+    leftMargin=0.75 * inch,
+    topMargin=0.75 * inch,
+    bottomMargin=0.75 * inch,
+)
+    story = []
+    
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    for child in root:
+        if child.tag == "personal_info":
+            name = child.find("name").text
+            contact = child.find("contact")
+            email = contact.find("email").text
+            phone = contact.find("phone").text
+            location = contact.find("location").text
+            story.append(StyledName(name))
+            story.extend(StyledContactInfo(email, phone, location))
+        elif child.tag == "education":
+            for institution in child.findall("institution"):
+                story.extend(StyledSectionHeader("Education"))
+                name = institution.find("name").text
+                degree = institution.find("degree").text
+                gpa = institution.find("gpa").text
+                graduation_date = institution.find("graduation_date").text
+                location = institution.find("location").text
+                story.append(StyledEduHeader(name, degree, gpa, graduation_date, location))
+        elif child.tag == "experience":
+            for job in child.findall("job"):
+                story.extend(StyledSectionHeader("Experience"))
+                title = job.find("title").text
+                meta = job.find("meta").text
+                date = job.find("date").text
+                location = job.find("location").text
+                story.append(StyledJobHeader(title, meta, date, location))
+                responsibilities = job.find("responsibilities")
+                for resp in responsibilities.findall("responsibility"):
+                    story.append(StyledResponsibility(resp.text))
+            
+            
+            # Further processing would go here
+            
