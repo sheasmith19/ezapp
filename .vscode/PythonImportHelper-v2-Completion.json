@@ -1,11 +1,60 @@
 [
     {
-        "label": "json",
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Request",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "CORSMiddleware",
+        "importPath": "fastapi.middleware.cors",
+        "description": "fastapi.middleware.cors",
+        "isExtraImport": true,
+        "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "os",
         "kind": 6,
         "isExtraImport": true,
-        "importPath": "json",
-        "description": "json",
-        "detail": "json",
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "git",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "git",
+        "description": "git",
+        "detail": "git",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
         "documentation": {}
     },
     {
@@ -17,12 +66,19 @@
         "documentation": {}
     },
     {
-        "label": "git",
-        "kind": 6,
+        "label": "FileResponse",
+        "importPath": "fastapi.responses",
+        "description": "fastapi.responses",
         "isExtraImport": true,
-        "importPath": "git",
-        "description": "git",
-        "detail": "git",
+        "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
+        "label": "BuildFromXML",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
+        "isExtraImport": true,
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
@@ -66,14 +122,6 @@
         "documentation": {}
     },
     {
-        "label": "LETTER",
-        "importPath": "reportlab.lib.pagesizes",
-        "description": "reportlab.lib.pagesizes",
-        "isExtraImport": true,
-        "detail": "reportlab.lib.pagesizes",
-        "documentation": {}
-    },
-    {
         "label": "ParagraphStyle",
         "importPath": "reportlab.lib.styles",
         "description": "reportlab.lib.styles",
@@ -87,14 +135,6 @@
         "description": "reportlab.lib.styles",
         "isExtraImport": true,
         "detail": "reportlab.lib.styles",
-        "documentation": {}
-    },
-    {
-        "label": "inch",
-        "importPath": "reportlab.lib.units",
-        "description": "reportlab.lib.units",
-        "isExtraImport": true,
-        "detail": "reportlab.lib.units",
         "documentation": {}
     },
     {
@@ -171,218 +211,219 @@
         "documentation": {}
     },
     {
-        "label": "pdfplumber",
+        "label": "json",
         "kind": 6,
         "isExtraImport": true,
-        "importPath": "pdfplumber",
-        "description": "pdfplumber",
-        "detail": "pdfplumber",
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
         "documentation": {}
     },
     {
-        "label": "canvas",
-        "importPath": "reportlab.pdfgen",
-        "description": "reportlab.pdfgen",
-        "isExtraImport": true,
-        "detail": "reportlab.pdfgen",
-        "documentation": {}
-    },
-    {
-        "label": "_Known",
+        "label": "ResumeData",
         "kind": 6,
-        "importPath": "ezapp.node_modules.flatted.python.flatted",
-        "description": "ezapp.node_modules.flatted.python.flatted",
-        "peekOfCode": "class _Known:\n    def __init__(self):\n        self.key = []\n        self.value = []\nclass _String:\n    def __init__(self, value):\n        self.value = value\ndef _array_keys(value):\n    keys = []\n    i = 0",
-        "detail": "ezapp.node_modules.flatted.python.flatted",
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "class ResumeData(BaseModel):\n    xml: str\n    save_name: str\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")\napp = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API",
+        "detail": "backend.api",
         "documentation": {}
     },
     {
-        "label": "_String",
-        "kind": 6,
-        "importPath": "ezapp.node_modules.flatted.python.flatted",
-        "description": "ezapp.node_modules.flatted.python.flatted",
-        "peekOfCode": "class _String:\n    def __init__(self, value):\n        self.value = value\ndef _array_keys(value):\n    keys = []\n    i = 0\n    for _ in value:\n        keys.append(i)\n        i += 1\n    return keys",
-        "detail": "ezapp.node_modules.flatted.python.flatted",
+        "label": "RESUME_DIR",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "RESUME_DIR = \"resumes\"\nOUTPUT_DIR = \"outputs\"\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")",
+        "detail": "backend.api",
         "documentation": {}
     },
     {
-        "label": "parse",
-        "kind": 2,
-        "importPath": "ezapp.node_modules.flatted.python.flatted",
-        "description": "ezapp.node_modules.flatted.python.flatted",
-        "peekOfCode": "def parse(value, *args, **kwargs):\n    json = _json.loads(value, *args, **kwargs)\n    wrapped = []\n    for value in json:\n        wrapped.append(_wrap(value))\n    input = []\n    for value in wrapped:\n        if isinstance(value, _String):\n            input.append(value.value)\n        else:",
-        "detail": "ezapp.node_modules.flatted.python.flatted",
+        "label": "OUTPUT_DIR",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "OUTPUT_DIR = \"outputs\"\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")\napp = FastAPI()",
+        "detail": "backend.api",
         "documentation": {}
     },
     {
-        "label": "stringify",
-        "kind": 2,
-        "importPath": "ezapp.node_modules.flatted.python.flatted",
-        "description": "ezapp.node_modules.flatted.python.flatted",
-        "peekOfCode": "def stringify(value, *args, **kwargs):\n    known = _Known()\n    input = []\n    output = []\n    i = int(_index(known, input, value))\n    while i < len(input):\n        output.append(_transform(known, input, input[i]))\n        i += 1\n    return _json.dumps(output, *args, **kwargs)",
-        "detail": "ezapp.node_modules.flatted.python.flatted",
+        "label": "app",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "app = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], \n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\nRESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nif not os.path.exists(RESUME_DIR):",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "RESUME_DIR",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "RESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nif not os.path.exists(RESUME_DIR):\n    os.makedirs(RESUME_DIR)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # In a real app, you'd probably get a filename from a header or query param\n    filename = os.path.join(RESUME_DIR, save_name + \".xml\")\n    pdf_filename = filename.replace(\".xml\", \".pdf\")\n    xml_data = data.xml.encode('utf-8')",
+        "detail": "backend.api",
         "documentation": {}
     },
     {
         "label": "outputPath",
         "kind": 5,
-        "importPath": "gitsave",
-        "description": "gitsave",
+        "importPath": "backend.gitsave",
+        "description": "backend.gitsave",
         "peekOfCode": "outputPath = \"/Users/sheasmith/Documents/resumes/resume_from_xml.pdf\"\nBuildFromXML(\"resume.xml\", outputPath)\nrepo = git.Repo(\"/Users/sheasmith/Documents/resumes/\")\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
-        "detail": "gitsave",
+        "detail": "backend.gitsave",
         "documentation": {}
     },
     {
         "label": "repo",
         "kind": 5,
-        "importPath": "gitsave",
-        "description": "gitsave",
+        "importPath": "backend.gitsave",
+        "description": "backend.gitsave",
         "peekOfCode": "repo = git.Repo(\"/Users/sheasmith/Documents/resumes/\")\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
-        "detail": "gitsave",
+        "detail": "backend.gitsave",
         "documentation": {}
     },
     {
         "label": "origin",
         "kind": 5,
-        "importPath": "gitsave",
-        "description": "gitsave",
+        "importPath": "backend.gitsave",
+        "description": "backend.gitsave",
         "peekOfCode": "origin = repo.remote(name=\"origin\")\norigin.push()",
-        "detail": "gitsave",
+        "detail": "backend.gitsave",
         "documentation": {}
     },
     {
         "label": "StyledName",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(email: str, phone: str, location: str):\n    return [Paragraph(f\"{email} | {phone} | {location}\", styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "StyledContactInfo",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def StyledContactInfo(email: str, phone: str, location: str):\n    return [Paragraph(f\"{email} | {phone} | {location}\", styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "StyledSectionHeader",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,\n                spaceAfter=0,\n            )\n    ]",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "StyledEduHeader",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{name}</b>\", styles[\"JobTitle\"]), Paragraph(f\"{degree} | GPA: {gpa}\", styles[\"JobMeta\"])],\n                Paragraph(f\"{graduation_date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "StyledJobHeader",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "StyledResponsibility",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def StyledResponsibility(text: str):\n    return ListFlowable(\n            [\n                Paragraph(\n                    text,\n                    styles[\"Body\"],\n                )\n            ],\n            bulletType=\"bullet\",\n            bulletFontName=\"Helvetica\",",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "get_txt",
+        "kind": 2,
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
+        "peekOfCode": "def get_txt(el, tag, default=\"\"):\n    \"\"\"Safely extracts text or returns an empty string.\"\"\"\n    found = el.find(tag)\n    if found is not None and found.text is not None:\n        return found.text.strip()\n    return default\ndef BuildFromXML(xml_path: str, output_path: str):\n    doc = SimpleDocTemplate(\n    output_path,\n    pagesize=LETTER,",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "BuildFromXML",
         "kind": 2,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "def BuildFromXML(xml_path: str, output_path: str):\n    doc = SimpleDocTemplate(\n    output_path,\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\n    story = []",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "styles",
         "kind": 5,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "styles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Times\",\n    fontSize=18,\n    spaceAfter=12,\n))\nstyles.add(ParagraphStyle(\n    name=\"SectionHeader\",\n    fontName=\"Times\",",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "JOB_HEADER_TABLE_STYLE",
         "kind": 5,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "JOB_HEADER_TABLE_STYLE = (TableStyle(\n    [(\"VALIGN\", (0, 0), (-1, -1), \"TOP\"),\n     (\"LEFTPADDING\", (0, 0), (-1, -1), 0),\n     (\"RIGHTPADDING\", (0, 0), (-1, -1), 0),\n     (\"TOPPADDING\", (0, 0), (-1, -1), 0),\n     (\"BOTTOMPADDING\", (0, 0), (-1, -1), 2),\n    ]))\ndoc = SimpleDocTemplate(\n    \"resume.pdf\",\n    pagesize=LETTER,",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
         "label": "doc",
         "kind": 5,
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "peekOfCode": "doc = SimpleDocTemplate(\n    \"resume.pdf\",\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\ndef StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])",
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
-        "label": "extract_pages",
+        "label": "_Known",
+        "kind": 6,
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "class _Known:\n    def __init__(self):\n        self.key = []\n        self.value = []\nclass _String:\n    def __init__(self, value):\n        self.value = value\ndef _array_keys(value):\n    keys = []\n    i = 0",
+        "detail": "frontend.node_modules.flatted.python.flatted",
+        "documentation": {}
+    },
+    {
+        "label": "_String",
+        "kind": 6,
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "class _String:\n    def __init__(self, value):\n        self.value = value\ndef _array_keys(value):\n    keys = []\n    i = 0\n    for _ in value:\n        keys.append(i)\n        i += 1\n    return keys",
+        "detail": "frontend.node_modules.flatted.python.flatted",
+        "documentation": {}
+    },
+    {
+        "label": "parse",
         "kind": 2,
-        "importPath": "parsepdf",
-        "description": "parsepdf",
-        "peekOfCode": "def extract_pages(pdf_path):\n    pages_text = []\n    with pdfplumber.open(pdf_path) as pdf:\n        for page in pdf.pages:\n            text = page.extract_text()\n            pages_text.append(text or \"\")\n    return pages_text\nfrom reportlab.lib.pagesizes import LETTER\nfrom reportlab.pdfgen import canvas\nfrom reportlab.lib.units import inch",
-        "detail": "parsepdf",
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "def parse(value, *args, **kwargs):\n    json = _json.loads(value, *args, **kwargs)\n    wrapped = []\n    for value in json:\n        wrapped.append(_wrap(value))\n    input = []\n    for value in wrapped:\n        if isinstance(value, _String):\n            input.append(value.value)\n        else:",
+        "detail": "frontend.node_modules.flatted.python.flatted",
         "documentation": {}
     },
     {
-        "label": "rebuild_pdf",
+        "label": "stringify",
         "kind": 2,
-        "importPath": "parsepdf",
-        "description": "parsepdf",
-        "peekOfCode": "def rebuild_pdf(pages_text, output_path):\n    c = canvas.Canvas(output_path, pagesize=LETTER)\n    width, height = LETTER\n    for page_text in pages_text:\n        text_obj = c.beginText()\n        text_obj.setTextOrigin(1 * inch, height - 1 * inch)\n        text_obj.setFont(\"Helvetica\", 11)\n        for line in page_text.split(\"\\n\"):\n            text_obj.textLine(line)\n        c.drawText(text_obj)",
-        "detail": "parsepdf",
-        "documentation": {}
-    },
-    {
-        "label": "input_pdf",
-        "kind": 5,
-        "importPath": "parsepdf",
-        "description": "parsepdf",
-        "peekOfCode": "input_pdf = \"A-resume.pdf\"\noutput_pdf = \"output.pdf\"\npages = extract_pages(input_pdf)\nrebuild_pdf(pages, output_pdf)",
-        "detail": "parsepdf",
-        "documentation": {}
-    },
-    {
-        "label": "output_pdf",
-        "kind": 5,
-        "importPath": "parsepdf",
-        "description": "parsepdf",
-        "peekOfCode": "output_pdf = \"output.pdf\"\npages = extract_pages(input_pdf)\nrebuild_pdf(pages, output_pdf)",
-        "detail": "parsepdf",
-        "documentation": {}
-    },
-    {
-        "label": "pages",
-        "kind": 5,
-        "importPath": "parsepdf",
-        "description": "parsepdf",
-        "peekOfCode": "pages = extract_pages(input_pdf)\nrebuild_pdf(pages, output_pdf)",
-        "detail": "parsepdf",
+        "importPath": "frontend.node_modules.flatted.python.flatted",
+        "description": "frontend.node_modules.flatted.python.flatted",
+        "peekOfCode": "def stringify(value, *args, **kwargs):\n    known = _Known()\n    input = []\n    output = []\n    i = int(_index(known, input, value))\n    while i < len(input):\n        output.append(_transform(known, input, input[i]))\n        i += 1\n    return _json.dumps(output, *args, **kwargs)",
+        "detail": "frontend.node_modules.flatted.python.flatted",
         "documentation": {}
     }
 ]

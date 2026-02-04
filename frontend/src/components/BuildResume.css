@@ -1,0 +1,57 @@
+/* Remove default browser margins */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.build-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden; /* Prevents the whole page from bouncing */
+}
+
+.form-side {
+  flex: 1; /* Adjust ratio (e.g., 0.8 for smaller form, 1.2 for larger) */
+  padding: 2rem;
+  overflow-y: auto; /* Only the form scrolls */
+  background-color: #312f2f;
+  border-right: 1px solid #e0e0e0;
+}
+
+
+.section { margin-bottom: 30px; }
+
+input, textarea {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.item-group {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.xml-preview {
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+  padding: 15px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}

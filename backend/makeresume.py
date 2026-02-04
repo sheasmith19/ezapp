@@ -139,6 +139,13 @@ def StyledResponsibility(text: str):
             leftIndent=12,     # controls hanging indent
         )
 
+def get_txt(el, tag, default=""):
+    """Safely extracts text or returns an empty string."""
+    found = el.find(tag)
+    if found is not None and found.text is not None:
+        return found.text.strip()
+    return default
+
 def BuildFromXML(xml_path: str, output_path: str):
     doc = SimpleDocTemplate(
     output_path,
@@ -154,35 +161,32 @@ def BuildFromXML(xml_path: str, output_path: str):
     root = tree.getroot()
     for child in root:
         if child.tag == "personal_info":
-            name = child.find("name").text
-            contact = child.find("contact")
-            email = contact.find("email").text
-            phone = contact.find("phone").text
-            location = contact.find("location").text
+            name = get_txt(child, "name", "")
+            email = get_txt(child, "email", "")
+            phone = get_txt(child, "phone", "")
+            location = get_txt(child, "location", "")
             story.append(StyledName(name))
             story.extend(StyledContactInfo(email, phone, location))
         elif child.tag == "education":
             for institution in child.findall("institution"):
                 story.extend(StyledSectionHeader("Education"))
-                name = institution.find("name").text
-                degree = institution.find("degree").text
-                gpa = institution.find("gpa").text
-                graduation_date = institution.find("graduation_date").text
-                location = institution.find("location").text
+                name = get_txt(institution, "name", "")
+                degree = get_txt(institution, "degree", "")
+                gpa = get_txt(institution, "gpa", "")
+                graduation_date = get_txt(institution, "graduation_date", "")
+                location = get_txt(institution, "location", "")
                 story.extend(StyledEduHeader(name, degree, gpa, graduation_date, location))
         elif child.tag == "experience":
             story.extend(StyledSectionHeader("Experience"))
             for job in child.findall("job"):
-                company = job.find("company").text
-                location = job.find("location").text
-                duration = job.find("duration").text
-                position = job.find("position").text
+                company = get_txt(job, "company", "")
+                location = get_txt(job, "location", "")
+                duration = get_txt(job, "duration", "")
+                position = get_txt(job, "position", "")
                 story.extend(StyledJobHeader(company, location, duration, position))
                 responsibilities = job.find("responsibilities")
                 for resp in responsibilities.findall("responsibility"):
                     story.append(StyledResponsibility(resp.text))
     
     doc.build(story)
-    
-BuildFromXML("resume.xml", "resume_from_xml.pdf")
             

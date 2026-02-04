@@ -1,5 +1,5 @@
 # save the resume to the git repo and push
-from makeresume import BuildFromXML
+from backend.makeresume import BuildFromXML
 import git
 
 outputPath = "/Users/sheasmith/Documents/resumes/resume_from_xml.pdf"

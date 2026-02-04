@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resume>
+  <personal_info>
+    <name>Shea Smith</name>
+    <contact>
+      <email>hello jjjelo </email>
+      <phone></phone>
+      <location></location>
+    </contact>
+  </personal_info>
+  <education>
+    
+    <institution>
+      <name></name>
+      <degree></degree>
+      <gpa></gpa>
+      <graduation_date></graduation_date>
+      <location></location>
+    </institution>
+    <institution>
+      <name></name>
+      <degree></degree>
+      <gpa></gpa>
+      <graduation_date></graduation_date>
+      <location></location>
+    </institution>
+  </education>
+  <experience>
+    
+    <job>
+      <company></company>
+      <location></location>
+      <duration></duration>
+      <position></position>
+      <responsibilities>
+        <responsibility></responsibility>
+      </responsibilities>
+    </job>
+  </experience>
+</resume>
