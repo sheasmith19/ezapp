@@ -74,6 +74,15 @@
         "documentation": {}
     },
     {
+        "label": "xml.etree.ElementTree",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "xml.etree.ElementTree",
+        "description": "xml.etree.ElementTree",
+        "detail": "xml.etree.ElementTree",
+        "documentation": {}
+    },
+    {
         "label": "BuildFromXML",
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
@@ -202,15 +211,6 @@
         "documentation": {}
     },
     {
-        "label": "xml.etree.ElementTree",
-        "kind": 6,
-        "isExtraImport": true,
-        "importPath": "xml.etree.ElementTree",
-        "description": "xml.etree.ElementTree",
-        "detail": "xml.etree.ElementTree",
-        "documentation": {}
-    },
-    {
         "label": "json",
         "kind": 6,
         "isExtraImport": true,
@@ -251,7 +251,7 @@
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "app = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], \n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\nRESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nif not os.path.exists(RESUME_DIR):",
+        "peekOfCode": "app = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], \n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\nRESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nXML_DIR = os.path.join(RESUME_DIR, \"xml\")",
         "detail": "backend.api",
         "documentation": {}
     },
@@ -260,7 +260,25 @@
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "RESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nif not os.path.exists(RESUME_DIR):\n    os.makedirs(RESUME_DIR)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # In a real app, you'd probably get a filename from a header or query param\n    filename = os.path.join(RESUME_DIR, save_name + \".xml\")\n    pdf_filename = filename.replace(\".xml\", \".pdf\")\n    xml_data = data.xml.encode('utf-8')",
+        "peekOfCode": "RESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nXML_DIR = os.path.join(RESUME_DIR, \"xml\")\nPDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\nfor folder in [RESUME_DIR, XML_DIR, PDF_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # Save XML to xml subfolder",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "XML_DIR",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "XML_DIR = os.path.join(RESUME_DIR, \"xml\")\nPDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\nfor folder in [RESUME_DIR, XML_DIR, PDF_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # Save XML to xml subfolder\n    xml_filename = os.path.join(XML_DIR, save_name + \".xml\")",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "PDF_DIR",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "PDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\nfor folder in [RESUME_DIR, XML_DIR, PDF_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # Save XML to xml subfolder\n    xml_filename = os.path.join(XML_DIR, save_name + \".xml\")\n    # Save PDF to pdf subfolder",
         "detail": "backend.api",
         "documentation": {}
     },
@@ -296,7 +314,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(email: str, phone: str, location: str):\n    return [Paragraph(f\"{email} | {phone} | {location}\", styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,",
+        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(email: str, phone: str, location: str):\n    # Build contact info only with non-empty fields\n    contact_parts = []\n    if email:\n        contact_parts.append(email)\n    if phone:\n        contact_parts.append(phone)\n    if location:",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -305,7 +323,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledContactInfo(email: str, phone: str, location: str):\n    return [Paragraph(f\"{email} | {phone} | {location}\", styles['Body']), \n            Spacer(1, 8)]\ndef StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,",
+        "peekOfCode": "def StyledContactInfo(email: str, phone: str, location: str):\n    # Build contact info only with non-empty fields\n    contact_parts = []\n    if email:\n        contact_parts.append(email)\n    if phone:\n        contact_parts.append(phone)\n    if location:\n        contact_parts.append(location)\n    contact_text = \" | \".join(contact_parts) if contact_parts else \"\"",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -324,6 +342,15 @@
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
         "peekOfCode": "def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{name}</b>\", styles[\"JobTitle\"]), Paragraph(f\"{degree} | GPA: {gpa}\", styles[\"JobMeta\"])],\n                Paragraph(f\"{graduation_date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
+        "detail": "backend.makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "StyledSkills",
+        "kind": 2,
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
+        "peekOfCode": "def StyledSkills(skills: str):\n    return Paragraph(skills, styles[\"Skills\"])\ndef StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],",
         "detail": "backend.makeresume",
         "documentation": {}
     },

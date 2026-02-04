@@ -1,14 +1,39 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function BuildResume() {
   const [resume, setResume] = useState({
     save_name: "Resume 1",
     personal: { name: "", email: "", phone: "", location: "" },
     education: [],
+    skills: [{ category: "", items: [] }],
     experience: []
   });
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const resumeName = searchParams.get('resume');
+
+  // Load existing resume if resume name is provided
+  useEffect(() => {
+    if (resumeName) {
+      const fetchResume = async () => {
+        try {
+          const res = await fetch(`http://localhost:8000/get-resume/${resumeName}`);
+          if (res.ok) {
+            const data = await res.json();
+            // Convert underscores back to spaces in the name
+            data.save_name = data.save_name.replace(/_/g, ' ');
+            setResume(data);
+          } else {
+            alert("Failed to load resume");
+          }
+        } catch (err) {
+          alert("Error loading resume: " + err.message);
+        }
+      };
+      fetchResume();
+    }
+  }, [resumeName]);
 
   // --- 1. Resume State Management ---
   const updateName = (val) => setResume({ ...resume, save_name: val });
@@ -35,36 +60,65 @@ export default function BuildResume() {
     setResume({ ...resume, experience: updatedExp });
   };
 
+  const removeResponsibility = (jobIdx, resIdx) => {
+    const updatedExp = [...resume.experience];
+    updatedExp[jobIdx].responsibilities = updatedExp[jobIdx].responsibilities.filter((_, i) => i !== resIdx);
+    setResume({ ...resume, experience: updatedExp });
+  };
+
+  const removeArrayItem = (section, index) => {
+    const updated = resume[section].filter((_, i) => i !== index);
+    setResume({ ...resume, [section]: updated });
+  };
+
   // --- The XML Generator ---
+  // Escape XML special characters
+  const escapeXml = (str) => {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  };
+
   const generateXML = () => {
-    const { personal, education, experience } = resume;
+    const { personal, education, skills, experience } = resume;
     return `<?xml version="1.0" encoding="UTF-8"?>
             <resume>
               <personal_info>
-                <name>${personal.name}</name>
-                <email>${personal.email}</email>
-                <phone>${personal.phone}</phone>
-                <location>${personal.location}</location>
+                <name>${escapeXml(personal.name)}</name>
+                <email>${escapeXml(personal.email)}</email>
+                <phone>${escapeXml(personal.phone)}</phone>
+                <location>${escapeXml(personal.location)}</location>
               </personal_info>
               <education>
                 ${education.map(edu => `
                 <institution>
-                  <name>${edu.institution}</name>
-                  <degree>${edu.degree}</degree>
-                  <gpa>${edu.gpa}</gpa>
-                  <graduation_date>${edu.date}</graduation_date>
-                  <location>${edu.location}</location>
+                  <name>${escapeXml(edu.institution)}</name>
+                  <degree>${escapeXml(edu.degree)}</degree>
+                  <gpa>${escapeXml(edu.gpa)}</gpa>
+                  <graduation_date>${escapeXml(edu.date)}</graduation_date>
+                  <location>${escapeXml(edu.location)}</location>
                 </institution>`).join('')}
               </education>
+              <skills>
+                ${skills.map(skillGroup => `
+                <skillgroup>
+                  <category>${escapeXml(skillGroup.category)}</category>
+                  <items>${skillGroup.items.map(item => `<item>${escapeXml(item)}</item>`).join('')}</items>
+                </skillgroup>`).join('')}
+              </skills>
               <experience>
                 ${experience.map(job => `
                 <job>
-                  <company>${job.company}</company>
-                  <location>${job.location}</location>
-                  <duration>${job.duration}</duration>
-                  <position>${job.position}</position>
+                  <company>${escapeXml(job.company)}</company>
+                  <location>${escapeXml(job.location)}</location>
+                  <duration>${escapeXml(job.duration)}</duration>
+                  <position>${escapeXml(job.position)}</position>
                   <responsibilities>
-                    ${job.responsibilities.map(res => `<responsibility>${res}</responsibility>`).join('')}
+                    ${job.responsibilities.map(res => `<responsibility>${escapeXml(res)}</responsibility>`).join('')}
                   </responsibilities>
                 </job>`).join('')}
               </experience>
@@ -159,6 +213,49 @@ export default function BuildResume() {
             </button>
         </div>
 
+        {/* SKILLS */}
+        <div className="section">
+          <h3>Skills</h3>
+          {resume.skills.map((skillGroup, groupIdx) => (
+            <div key={groupIdx} className="item-group">
+              <input 
+                placeholder="Category (e.g. Software, Programming)" 
+                value={skillGroup.category}
+                onChange={e => {
+                  const updated = [...resume.skills];
+                  updated[groupIdx].category = e.target.value;
+                  setResume({ ...resume, skills: updated });
+                }}
+              />
+              
+              <textarea 
+                placeholder="List skills (e.g. Onshape, SolidWorks, CATIA)"
+                value={skillGroup.items.join(', ')}
+                onChange={e => {
+                  const updated = [...resume.skills];
+                  updated[groupIdx].items = e.target.value.split(',').map(item => item.trim()).filter(item => item);
+                  setResume({ ...resume, skills: updated });
+                }}
+                style={{ marginTop: '8px', minHeight: '60px', width: '100%' }}
+              />
+
+              <button 
+                className="delete-btn" 
+                onClick={() => removeArrayItem('skills', groupIdx)}
+                style={{ marginTop: '8px' }}
+              >
+                Remove Category
+              </button>
+            </div>
+          ))}
+          <button 
+            className="add-btn" 
+            onClick={() => addArrayItem('skills', { category: "", items: [""] })}
+          >
+            + Add Skill Category
+          </button>
+        </div>
+
         {/* EXPERIENCE */}
         <div className="section">
           <h3>Experience</h3>
@@ -167,12 +264,30 @@ export default function BuildResume() {
               <input placeholder="Company" value={job.company} onChange={e => updateArrayItem('experience', jIdx, 'company', e.target.value)} />
               <input placeholder="Position" value={job.position} onChange={e => updateArrayItem('experience', jIdx, 'position', e.target.value)} />
               
+              <div className="input-grid">
+                <input 
+                  placeholder="Duration (e.g. June 2022 - Present)" 
+                  value={job.duration} 
+                  onChange={e => updateArrayItem('experience', jIdx, 'duration', e.target.value)} 
+                />
+                <input 
+                  placeholder="Location" 
+                  value={job.location} 
+                  onChange={e => updateArrayItem('experience', jIdx, 'location', e.target.value)} 
+                />
+              </div>
+              
               <div className="bullets">
                 {job.responsibilities.map((res, rIdx) => (
-                  <textarea key={rIdx} value={res} onChange={e => updateResponsibility(jIdx, rIdx, e.target.value)} />
+                  <div key={rIdx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+                    <textarea value={res} onChange={e => updateResponsibility(jIdx, rIdx, e.target.value)} />
+                    <button className="delete-btn" onClick={() => removeResponsibility(jIdx, rIdx)}>✕</button>
+                  </div>
                 ))}
                 <button className="small-btn" onClick={() => addResponsibility(jIdx)}>+ Bullet</button>
               </div>
+
+              <button className="delete-btn" onClick={() => removeArrayItem('experience', jIdx)}>Remove Job</button>
             </div>
           ))}
           <button onClick={() => addArrayItem('experience', { company: "", location: "", duration: "", position: "", responsibilities: [""] })}>+ Add Job</button>

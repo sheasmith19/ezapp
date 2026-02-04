@@ -84,7 +84,17 @@ def StyledName(text: str):
     return Paragraph(text, styles["Name"])
 
 def StyledContactInfo(email: str, phone: str, location: str):
-    return [Paragraph(f"{email} | {phone} | {location}", styles['Body']), 
+    # Build contact info only with non-empty fields
+    contact_parts = []
+    if email:
+        contact_parts.append(email)
+    if phone:
+        contact_parts.append(phone)
+    if location:
+        contact_parts.append(location)
+    
+    contact_text = " | ".join(contact_parts) if contact_parts else ""
+    return [Paragraph(contact_text, styles['Body']), 
             Spacer(1, 8)]
 
 def StyledSectionHeader(text: str):
@@ -110,6 +120,9 @@ def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, loca
     )
     header.setStyle(JOB_HEADER_TABLE_STYLE)
     return [Spacer(1, 8), header]
+
+def StyledSkills(skills: str):
+    return Paragraph(skills, styles["Skills"])
 
 def StyledJobHeader(company: str, location: str, duration: str, position: str):
     header = Table(
@@ -176,17 +189,41 @@ def BuildFromXML(xml_path: str, output_path: str):
                 graduation_date = get_txt(institution, "graduation_date", "")
                 location = get_txt(institution, "location", "")
                 story.extend(StyledEduHeader(name, degree, gpa, graduation_date, location))
+        elif child.tag == "skills":
+            skillgroups = child.findall("skillgroup")
+            # Only add Skills section if there are skillgroups with content
+            has_skills = False
+            skill_items = []
+            
+            for skillgroup in skillgroups:
+                category = get_txt(skillgroup, "category", "")
+                items_elem = skillgroup.find("items")
+                items = [item.text for item in items_elem.findall("item") if item.text] if items_elem is not None else []
+                
+                if category and items:
+                    has_skills = True
+                    items_str = ", ".join(items)
+                    skill_text = f"<i>{category}:</i> {items_str}"
+                    skill_items.append(Paragraph(skill_text, styles["Body"]))
+            
+            if has_skills:
+                story.extend(StyledSectionHeader("Skills"))
+                story.extend(skill_items)
+                story.append(Spacer(1, 8))
         elif child.tag == "experience":
-            story.extend(StyledSectionHeader("Experience"))
-            for job in child.findall("job"):
-                company = get_txt(job, "company", "")
-                location = get_txt(job, "location", "")
-                duration = get_txt(job, "duration", "")
-                position = get_txt(job, "position", "")
-                story.extend(StyledJobHeader(company, location, duration, position))
-                responsibilities = job.find("responsibilities")
-                for resp in responsibilities.findall("responsibility"):
-                    story.append(StyledResponsibility(resp.text))
+            jobs = child.findall("job")
+            # Only add Experience section if there are jobs
+            if jobs:
+                story.extend(StyledSectionHeader("Experience"))
+                for job in jobs:
+                    company = get_txt(job, "company", "")
+                    location = get_txt(job, "location", "")
+                    duration = get_txt(job, "duration", "")
+                    position = get_txt(job, "position", "")
+                    story.extend(StyledJobHeader(company, location, duration, position))
+                    responsibilities = job.find("responsibilities")
+                    for resp in responsibilities.findall("responsibility"):
+                        story.append(StyledResponsibility(resp.text))
     
     doc.build(story)
             

@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import Build from './components/build.jsx';
+import { Routes, Route, Link } from 'react-router-dom';
+import BuildResume from './components/BuildResume.jsx';
 import Dashboard from './components/Dashboard.jsx';
 
 function App() {
   return (
-    <Router>
+    <>
       <nav style={{ padding: "10px", borderBottom: "1px solid #ccc" }}>
         <Link to="/" style={{ marginRight: "10px" }}>Dashboard</Link>
         <Link to="/build">Build Resume</Link>
@@ -13,10 +13,10 @@ function App() {
       <div style={{ padding: "20px" }}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/build" element={<Build />} />
+          <Route path="/build" element={<BuildResume />} />
         </Routes>
       </div>
-    </Router>
+    </>
   );
 }
 
