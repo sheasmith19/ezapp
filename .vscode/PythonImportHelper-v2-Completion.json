@@ -211,6 +211,30 @@
         "documentation": {}
     },
     {
+        "label": "pdfmetrics",
+        "importPath": "reportlab.pdfbase",
+        "description": "reportlab.pdfbase",
+        "isExtraImport": true,
+        "detail": "reportlab.pdfbase",
+        "documentation": {}
+    },
+    {
+        "label": "TTFont",
+        "importPath": "reportlab.pdfbase.ttfonts",
+        "description": "reportlab.pdfbase.ttfonts",
+        "isExtraImport": true,
+        "detail": "reportlab.pdfbase.ttfonts",
+        "documentation": {}
+    },
+    {
+        "label": "canvas",
+        "importPath": "reportlab.pdfgen",
+        "description": "reportlab.pdfgen",
+        "isExtraImport": true,
+        "detail": "reportlab.pdfgen",
+        "documentation": {}
+    },
+    {
         "label": "json",
         "kind": 6,
         "isExtraImport": true,
@@ -314,7 +338,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])\ndef StyledContactInfo(email: str, phone: str, location: str):\n    # Build contact info only with non-empty fields\n    contact_parts = []\n    if email:\n        contact_parts.append(email)\n    if phone:\n        contact_parts.append(phone)\n    if location:",
+        "peekOfCode": "def StyledName(text: str):\n    return Paragraph(f\"<b>{text}</b>\", styles[\"Name\"])\ndef StyledContactInfo(email: str, phone: str, location: str):\n    # Build contact info only with non-empty fields\n    contact_parts = []\n    if email:\n        contact_parts.append(email)\n    if phone:\n        contact_parts.append(phone)\n    if location:",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -332,7 +356,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledSectionHeader(text: str):\n    return [Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,\n                spaceAfter=0,\n            )\n    ]",
+        "peekOfCode": "def StyledSectionHeader(text: str):\n    return [Spacer(1, SECTION_SPACING), Paragraph(text, styles[\"SectionHeader\"]),\n            HRFlowable(\n                width=\"100%\",\n                thickness=0.75,\n                color=\"#999999\",\n                spaceBefore=0,\n                spaceAfter=0,\n            )\n    ]",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -341,16 +365,16 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{name}</b>\", styles[\"JobTitle\"]), Paragraph(f\"{degree} | GPA: {gpa}\", styles[\"JobMeta\"])],\n                Paragraph(f\"{graduation_date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
+        "peekOfCode": "def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, location: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{name}</b>\", styles[\"JobTitle\"]), Paragraph(f\"{degree} | GPA: {gpa}\", styles[\"JobMeta\"])],\n                Paragraph(f\"{graduation_date}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.5 * inch],\n    )",
         "detail": "backend.makeresume",
         "documentation": {}
     },
     {
-        "label": "StyledSkills",
+        "label": "StyledSkillItem",
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledSkills(skills: str):\n    return Paragraph(skills, styles[\"Skills\"])\ndef StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],",
+        "peekOfCode": "def StyledSkillItem(category: str, items: str, is_first: bool = False):\n    spacing = SECTION_SPACING if is_first else 3\n    skill_text = f\"<font name=\\\"Garamond-I\\\">{category}:</font> {items}\"\n    return [Spacer(1, spacing), Paragraph(skill_text, styles[\"Body\"])]\ndef StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -395,7 +419,16 @@
         "kind": 5,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "styles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Times\",\n    fontSize=18,\n    spaceAfter=12,\n))\nstyles.add(ParagraphStyle(\n    name=\"SectionHeader\",\n    fontName=\"Times\",",
+        "peekOfCode": "styles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Garamond\",\n    fontSize=24,\n    spaceAfter=18,\n))\nstyles.add(ParagraphStyle(\n    name=\"SectionHeader\",\n    fontName=\"Garamond\",",
+        "detail": "backend.makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "SECTION_SPACING",
+        "kind": 5,
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
+        "peekOfCode": "SECTION_SPACING = 8  # Spacing before section content and between sections\nJOB_HEADER_TABLE_STYLE = (TableStyle(\n    [(\"VALIGN\", (0, 0), (-1, -1), \"TOP\"),\n     (\"LEFTPADDING\", (0, 0), (-1, -1), 0),\n     (\"RIGHTPADDING\", (0, 0), (-1, -1), 0),\n     (\"TOPPADDING\", (0, 0), (-1, -1), 0),\n     (\"BOTTOMPADDING\", (0, 0), (-1, -1), 2),\n    ]))\ndoc = SimpleDocTemplate(\n    \"resume.pdf\",",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -413,7 +446,7 @@
         "kind": 5,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "doc = SimpleDocTemplate(\n    \"resume.pdf\",\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\ndef StyledName(text: str):\n    return Paragraph(text, styles[\"Name\"])",
+        "peekOfCode": "doc = SimpleDocTemplate(\n    \"resume.pdf\",\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\ndef StyledName(text: str):\n    return Paragraph(f\"<b>{text}</b>\", styles[\"Name\"])",
         "detail": "backend.makeresume",
         "documentation": {}
     },

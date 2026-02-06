@@ -6,20 +6,28 @@ from reportlab.lib.units import inch
 from reportlab.platypus import (HRFlowable, ListFlowable, Paragraph,
                                 SimpleDocTemplate, Spacer, Table, TableStyle)
 import xml.etree.ElementTree as ET
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
+
+# 1. Register the font
+# RegisterFont(internal_name, font_file_path)
+pdfmetrics.registerFont(TTFont('Garamond', '/Users/sheasmith/Documents/ezapp/backend/EB_Garamond/EBGaramond-VariableFont_wght.ttf'))
+pdfmetrics.registerFont(TTFont('Garamond-I', '/Users/sheasmith/Documents/ezapp/backend/EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf'))
 
 styles = getSampleStyleSheet()
 
 styles.add(ParagraphStyle(
     name="Name",
-    fontName="Times",
-    fontSize=18,
-    spaceAfter=12,
+    fontName="Garamond",
+    fontSize=24,
+    spaceAfter=18,
 ))
 
 styles.add(ParagraphStyle(
     name="SectionHeader",
-    fontName="Times",
-    fontSize=12,
+    fontName="Garamond",
+    fontSize=14,
     textColor=black,
     spaceBefore=0,
     spaceAfter=6,
@@ -27,39 +35,41 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="JobTitle",
-    fontName="Times",
-    fontSize=10,
+    fontName="Garamond",
+    fontSize=12,
 ))
 
 styles.add(ParagraphStyle(
     name="DateLocation",
-    fontName="Times",
-    fontSize=10,
+    fontName="Garamond",
+    fontSize=12,
     alignment=TA_RIGHT
 ))
 
 styles.add(ParagraphStyle(
     name="JobMeta",
-    fontName="Times-Italic",
-    fontSize=9,
+    fontName="Garamond-I",
+    fontSize=12,
     textColor=grey,
     spaceAfter=4,
 ))
 
 styles.add(ParagraphStyle(
     name="Body",
-    fontName="Times",
-    fontSize=10,
+    fontName="Garamond",
+    fontSize=12,
     leading=14,
     spaceAfter=0,
 ))
 
 styles.add(ParagraphStyle(
     name="Skills",
-    fontName="Times-Italic",
-    fontSize=10,
+    fontName="Garamond-I",
+    fontSize=12,
 ))
 
+
+SECTION_SPACING = 8  # Spacing before section content and between sections
 
 JOB_HEADER_TABLE_STYLE = (TableStyle(
     [("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -68,8 +78,6 @@ JOB_HEADER_TABLE_STYLE = (TableStyle(
      ("TOPPADDING", (0, 0), (-1, -1), 0),
      ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
     ]))
-
-
 
 doc = SimpleDocTemplate(
     "resume.pdf",
@@ -81,7 +89,7 @@ doc = SimpleDocTemplate(
 )
 
 def StyledName(text: str):
-    return Paragraph(text, styles["Name"])
+    return Paragraph(f"<b>{text}</b>", styles["Name"])
 
 def StyledContactInfo(email: str, phone: str, location: str):
     # Build contact info only with non-empty fields
@@ -95,10 +103,10 @@ def StyledContactInfo(email: str, phone: str, location: str):
     
     contact_text = " | ".join(contact_parts) if contact_parts else ""
     return [Paragraph(contact_text, styles['Body']), 
-            Spacer(1, 8)]
+            Spacer(1, 4)]
 
 def StyledSectionHeader(text: str):
-    return [Paragraph(text, styles["SectionHeader"]),
+    return [Spacer(1, SECTION_SPACING), Paragraph(text, styles["SectionHeader"]),
             HRFlowable(
                 width="100%",
                 thickness=0.75,
@@ -116,13 +124,15 @@ def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, loca
                 Paragraph(f"{graduation_date}<br/>{location}", styles["DateLocation"]),
             ]
         ],
-        colWidths=[None, 1.25 * inch],
+        colWidths=[None, 1.5 * inch],
     )
     header.setStyle(JOB_HEADER_TABLE_STYLE)
-    return [Spacer(1, 8), header]
+    return [Spacer(1, SECTION_SPACING), header]
 
-def StyledSkills(skills: str):
-    return Paragraph(skills, styles["Skills"])
+def StyledSkillItem(category: str, items: str, is_first: bool = False):
+    spacing = SECTION_SPACING if is_first else 3
+    skill_text = f"<font name=\"Garamond-I\">{category}:</font> {items}"
+    return [Spacer(1, spacing), Paragraph(skill_text, styles["Body"])]
 
 def StyledJobHeader(company: str, location: str, duration: str, position: str):
     header = Table(
@@ -135,7 +145,7 @@ def StyledJobHeader(company: str, location: str, duration: str, position: str):
         colWidths=[None, 1.25 * inch],
     )
     header.setStyle(JOB_HEADER_TABLE_STYLE)
-    return [Spacer(1, 8), header]
+    return [Spacer(1, SECTION_SPACING), header]
     
     
 def StyledResponsibility(text: str):
@@ -194,6 +204,7 @@ def BuildFromXML(xml_path: str, output_path: str):
             # Only add Skills section if there are skillgroups with content
             has_skills = False
             skill_items = []
+            is_first_skill = True
             
             for skillgroup in skillgroups:
                 category = get_txt(skillgroup, "category", "")
@@ -203,13 +214,12 @@ def BuildFromXML(xml_path: str, output_path: str):
                 if category and items:
                     has_skills = True
                     items_str = ", ".join(items)
-                    skill_text = f"<i>{category}:</i> {items_str}"
-                    skill_items.append(Paragraph(skill_text, styles["Body"]))
+                    skill_items.extend(StyledSkillItem(category, items_str, is_first=is_first_skill))
+                    is_first_skill = False
             
             if has_skills:
                 story.extend(StyledSectionHeader("Skills"))
                 story.extend(skill_items)
-                story.append(Spacer(1, 8))
         elif child.tag == "experience":
             jobs = child.findall("job")
             # Only add Experience section if there are jobs
