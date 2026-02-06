@@ -10,21 +10,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     },
     (results) => {
       if (results && results[0] && results[0].result) {
-        // Found a resume field, update badge and open popup
+        // Found a resume field, update badge
         chrome.action.setBadgeText({ text: '📄', tabId });
         chrome.action.setBadgeBackgroundColor({ color: '#1a73e8', tabId });
-        
-        // Try to open the popup
-        chrome.action.openPopup().catch(() => {
-          // If popup open fails, show notification as fallback
-          chrome.notifications.create({
-            type: 'basic',
-            iconUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231a73e8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>',
-            title: 'Resume Upload Detected',
-            message: 'Click the extension icon to upload your resume',
-            contextMessage: 'Resume Pro'
-          });
-        });
       } else {
         // No resume field found, clear badge
         chrome.action.setBadgeText({ text: '', tabId });
@@ -41,15 +29,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (tabId) {
       chrome.action.setBadgeText({ text: '📄', tabId });
       chrome.action.setBadgeBackgroundColor({ color: '#1a73e8', tabId });
-      chrome.action.openPopup().catch(() => {
-        chrome.notifications.create({
-          type: 'basic',
-          iconUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231a73e8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>',
-          title: 'Resume Upload Detected',
-          message: 'Click the extension icon to upload your resume',
-          contextMessage: 'Resume Pro'
-        });
-      });
     }
     sendResponse({ ok: true });
     return true;
@@ -64,9 +43,10 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return resp.arrayBuffer().then((buffer) => ({ buffer, contentType }));
       })
       .then(({ buffer, contentType }) => {
+        const base64 = arrayBufferToBase64(buffer);
         sendResponse({
           ok: true,
-          buffer,
+          base64,
           contentType,
           filename: (new URL(downloadUrl)).pathname.split('/').pop() || 'resume.pdf'
         });
@@ -79,26 +59,88 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, i + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+  return btoa(binary);
+}
+
 // This function runs in the page context to detect resume fields
 function detectResumeField() {
-  // Just check if there are ANY file inputs on the page
-  // Most job sites with file inputs are for resume/CV
   const allFileInputs = document.querySelectorAll('input[type="file"]');
   console.log('Resume Pro: Found', allFileInputs.length, 'file inputs');
   
-  if (allFileInputs.length > 0) {
-    // Log all file inputs for debugging
-    for (let i = 0; i < allFileInputs.length; i++) {
-      const input = allFileInputs[i];
-      console.log(`Input ${i}:`, {
-        name: input.name,
-        id: input.id,
-        accept: input.accept,
-        visible: input.offsetParent !== null
-      });
+  if (allFileInputs.length === 0) return false;
+  
+  // Score each input based on proximity to "resume" or "CV" keywords
+  let bestInput = null;
+  let bestScore = 0;
+  
+  for (const input of allFileInputs) {
+    let score = 0;
+    
+    // Check attributes (name, id, placeholder, accept)
+    const name = (input.name || '').toLowerCase();
+    const id = (input.id || '').toLowerCase();
+    const placeholder = (input.placeholder || '').toLowerCase();
+    const accept = (input.accept || '').toLowerCase();
+    
+    if (name.includes('resume') || name.includes('cv')) score += 50;
+    if (id.includes('resume') || id.includes('cv')) score += 50;
+    if (placeholder.includes('resume') || placeholder.includes('cv')) score += 30;
+    // Removed: PDF acceptance alone doesn't indicate resume field
+    
+    // Check associated label
+    const label = document.querySelector(`label[for="${input.id}"]`);
+    if (label) {
+      const labelText = label.textContent.toLowerCase();
+      if (labelText.includes('resume') || labelText.includes('cv')) score += 40;
     }
-    return true; // If there are any file inputs, assume it's a resume upload opportunity
+    
+    // Check nearby text (within 200 characters of surrounding text)
+    let nearbyText = '';
+    let current = input.parentElement;
+    let depth = 0;
+    while (current && depth < 3) {
+      nearbyText += ' ' + (current.textContent || '');
+      current = current.parentElement;
+      depth++;
+    }
+    nearbyText = nearbyText.toLowerCase();
+    
+    const resumeMatches = (nearbyText.match(/resume/g) || []).length;
+    const cvMatches = (nearbyText.match(/\bcv\b/g) || []).length;
+    score += (resumeMatches + cvMatches) * 15;
+    
+    console.log(`Input score:`, {
+      name: input.name || input.id || 'unnamed',
+      score,
+      resumeMatches,
+      cvMatches
+    });
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestInput = input;
+    }
   }
   
+  // Only consider it a resume field if score is at least 30 (must have clear resume/CV indicators)
+  if (bestScore >= 30 && bestInput) {
+    // Store identifier for the best input
+    const identifier = bestInput.name || bestInput.id || `input-${Array.from(allFileInputs).indexOf(bestInput)}`;
+    console.log('Resume Pro: Best candidate:', identifier, 'score:', bestScore);
+    
+    // Store in session storage so content script can find it
+    sessionStorage.setItem('resumeUploaderTarget', identifier);
+    return true;
+  }
+  
+  console.log('Resume Pro: No resume field detected (best score:', bestScore, ')');
   return false;
 }
