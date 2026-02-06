@@ -16,8 +16,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 1. Register the font
 # RegisterFont(internal_name, font_file_path)
-pdfmetrics.registerFont(TTFont('Garamond', os.path.join(ROOT_DIR, 'EB_Garamond/EBGaramond-VariableFont_wght.ttf')))
-pdfmetrics.registerFont(TTFont('Garamond-I', os.path.join(ROOT_DIR, 'EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf')))
+pdfmetrics.registerFont(TTFont('Garamond', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-VariableFont_wght.ttf')))
+pdfmetrics.registerFont(TTFont('Garamond-I', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf')))
 
 styles = getSampleStyleSheet()
 
