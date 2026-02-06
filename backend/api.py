@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import git
 from pydantic import BaseModel
-from makeresume import BuildFromXML
+from backend.makeresume import BuildFromXML
 from fastapi.responses import FileResponse
 import xml.etree.ElementTree as ET
 import os
@@ -208,6 +208,32 @@ async def get_resume(resume_name: str):
     except Exception as e:
         print(f"ERROR: General error: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/resumes")
+async def resumes():
+    """Return a JSON array of available resume PDFs (filename only).
+    The popup builds the download URL using the API base + `/download-resume/{filename}`.
+    """
+    try:
+        files = [f for f in os.listdir(PDF_DIR) if f.endswith('.pdf')]
+        items = [{"name": f, "filename": f} for f in files]
+        return items
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/download-resume/{resume_name}")
+async def download_resume(resume_name: str):
+    # Serve the PDF file for the requested resume
+    pdf_filename = os.path.join(PDF_DIR, resume_name)
+    if not os.path.exists(pdf_filename):
+        raise HTTPException(status_code=404, detail="Resume not found")
+    response = FileResponse(pdf_filename, media_type='application/pdf', filename=resume_name)
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Resume Auto-Fill",
+  "version": "1.0",
+  "description": "Uploads resume from remote server to job boards.",
+  "permissions": ["activeTab", "scripting", "storage", "notifications"],
+  "host_permissions": ["<all_urls>"],
+  "content_security_policy": {
+    "script-src": ["'self'"],
+    "connect-src": ["'self'", "http://127.0.0.1:8000", "http://localhost:5000", "https:"]
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

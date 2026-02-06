@@ -59,10 +59,18 @@
     },
     {
         "label": "BuildFromXML",
-        "importPath": "makeresume",
-        "description": "makeresume",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
         "isExtraImport": true,
-        "detail": "makeresume",
+        "detail": "backend.makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "BuildFromXML",
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
+        "isExtraImport": true,
+        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
@@ -80,14 +88,6 @@
         "importPath": "xml.etree.ElementTree",
         "description": "xml.etree.ElementTree",
         "detail": "xml.etree.ElementTree",
-        "documentation": {}
-    },
-    {
-        "label": "BuildFromXML",
-        "importPath": "backend.makeresume",
-        "description": "backend.makeresume",
-        "isExtraImport": true,
-        "detail": "backend.makeresume",
         "documentation": {}
     },
     {
