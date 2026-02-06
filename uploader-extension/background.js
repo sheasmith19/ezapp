@@ -33,6 +33,52 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   );
 });
 
+// Listen for messages from content script when file input is detected dynamically
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === 'file-input-detected') {
+    console.log('Background: File input detected dynamically');
+    const tabId = sender.tab && sender.tab.id;
+    if (tabId) {
+      chrome.action.setBadgeText({ text: '📄', tabId });
+      chrome.action.setBadgeBackgroundColor({ color: '#1a73e8', tabId });
+      chrome.action.openPopup().catch(() => {
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%231a73e8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>',
+          title: 'Resume Upload Detected',
+          message: 'Click the extension icon to upload your resume',
+          contextMessage: 'Resume Pro'
+        });
+      });
+    }
+    sendResponse({ ok: true });
+    return true;
+  }
+  if (msg.action === 'fetch-resume') {
+    const downloadUrl = msg.downloadUrl;
+    console.log('Background: fetching resume', downloadUrl);
+    fetch(downloadUrl)
+      .then((resp) => {
+        if (!resp.ok) throw new Error('Download failed: ' + resp.status);
+        const contentType = resp.headers.get('content-type') || 'application/pdf';
+        return resp.arrayBuffer().then((buffer) => ({ buffer, contentType }));
+      })
+      .then(({ buffer, contentType }) => {
+        sendResponse({
+          ok: true,
+          buffer,
+          contentType,
+          filename: (new URL(downloadUrl)).pathname.split('/').pop() || 'resume.pdf'
+        });
+      })
+      .catch((err) => {
+        console.error('Background fetch failed:', err);
+        sendResponse({ ok: false, error: err.message });
+      });
+    return true;
+  }
+});
+
 // This function runs in the page context to detect resume fields
 function detectResumeField() {
   // Just check if there are ANY file inputs on the page

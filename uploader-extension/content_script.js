@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         
         try {
           // Convert ArrayBuffer back to Blob
-          const blob = new Blob([bgResp.blob], { type: bgResp.contentType });
+          const blob = new Blob([bgResp.buffer], { type: bgResp.contentType || 'application/pdf' });
           console.log('Downloaded blob:', blob.size, 'bytes, type:', bgResp.contentType);
 
           // If the page has a file input, attach the file
