@@ -10,10 +10,14 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
+# get the root direcotry of the project
+import os
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 # 1. Register the font
 # RegisterFont(internal_name, font_file_path)
-pdfmetrics.registerFont(TTFont('Garamond', '/Users/sheasmith/Documents/ezapp/backend/EB_Garamond/EBGaramond-VariableFont_wght.ttf'))
-pdfmetrics.registerFont(TTFont('Garamond-I', '/Users/sheasmith/Documents/ezapp/backend/EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf'))
+pdfmetrics.registerFont(TTFont('Garamond', os.path.join(ROOT_DIR, 'EB_Garamond/EBGaramond-VariableFont_wght.ttf')))
+pdfmetrics.registerFont(TTFont('Garamond-I', os.path.join(ROOT_DIR, 'EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf')))
 
 styles = getSampleStyleSheet()
 
