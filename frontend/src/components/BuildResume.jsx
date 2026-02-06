@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function BuildResume() {
@@ -53,6 +53,38 @@ export default function BuildResume() {
     updatedExp[jobIdx].responsibilities[resIdx] = val;
     setResume({ ...resume, experience: updatedExp });
   };
+
+  // Auto-resizing textarea component
+  function AutoResizeTextarea({ value, onChange, style = {}, ...props }) {
+    const ref = useRef(null);
+
+    useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
+      // Reset height then set to scrollHeight to shrink/grow as needed
+      el.style.height = '0px';
+      el.style.height = `${el.scrollHeight}px`;
+    }, [value]);
+
+    return (
+      <textarea
+        {...props}
+        ref={ref}
+        value={value}
+        onChange={(e) => {
+          // call parent's onChange
+          onChange(e);
+          // immediately adjust height for fast typing
+          const el = ref.current;
+          if (el) {
+            el.style.height = '0px';
+            el.style.height = `${el.scrollHeight}px`;
+          }
+        }}
+        style={{ boxSizing: 'border-box', width: '100%', ...style }}
+      />
+    );
+  }
 
   const addResponsibility = (jobIdx) => {
     const updatedExp = [...resume.experience];
@@ -228,7 +260,7 @@ export default function BuildResume() {
                 }}
               />
               
-              <textarea 
+              <AutoResizeTextarea
                 placeholder="List skills (e.g. Onshape, SolidWorks, CATIA)"
                 value={skillGroup.items.join(', ')}
                 onChange={e => {
@@ -236,7 +268,7 @@ export default function BuildResume() {
                   updated[groupIdx].items = e.target.value.split(',').map(item => item.trim()).filter(item => item);
                   setResume({ ...resume, skills: updated });
                 }}
-                style={{ marginTop: '8px', minHeight: '60px', width: '100%' }}
+                style={{ marginTop: '8px', minHeight: '60px' }}
               />
 
               <button 
@@ -280,7 +312,7 @@ export default function BuildResume() {
               <div className="bullets">
                 {job.responsibilities.map((res, rIdx) => (
                   <div key={rIdx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                    <textarea value={res} onChange={e => updateResponsibility(jIdx, rIdx, e.target.value)} />
+                    <AutoResizeTextarea value={res} onChange={e => updateResponsibility(jIdx, rIdx, e.target.value)} style={{ minHeight: '40px' }} />
                     <button className="delete-btn" onClick={() => removeResponsibility(jIdx, rIdx)}>✕</button>
                   </div>
                 ))}
