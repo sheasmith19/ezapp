@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 import git
 from pydantic import BaseModel
-from backend.makeresume import BuildFromXML
+from makeresume import BuildFromXML
 from fastapi.responses import FileResponse
 import xml.etree.ElementTree as ET
 import os
@@ -32,7 +32,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-RESUME_DIR = "/Users/sheasmith/Documents/resumes"
+# Use Documents/resumes folder (cross-platform)
+RESUME_DIR = os.path.join(os.path.expanduser("~"), "Documents", "resumes")
 XML_DIR = os.path.join(RESUME_DIR, "xml")
 PDF_DIR = os.path.join(RESUME_DIR, "pdf")
 
@@ -62,7 +63,7 @@ async def save_resume(data: ResumeData):
         BuildFromXML(xml_filename, pdf_filename)
         
         # 2. Git Commit logic
-        repo = git.Repo("/Users/sheasmith/Documents/resumes/")
+        repo = git.Repo(RESUME_DIR)
         repo.index.add([os.path.abspath(pdf_filename), os.path.abspath(xml_filename)])
         repo.index.commit(f"Update resume: {os.path.basename(pdf_filename)}")
         
