@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { apiGet, apiPost } from '../utils/api';
 
 export default function BuildResume() {
   const [resume, setResume] = useState({
@@ -18,7 +19,7 @@ export default function BuildResume() {
     if (resumeName) {
       const fetchResume = async () => {
         try {
-          const res = await fetch(`http://localhost:8000/get-resume/${resumeName}`);
+          const res = await apiGet(`/get-resume/${resumeName}`);
           if (res.ok) {
             const data = await res.json();
             // Convert underscores back to spaces in the name
@@ -128,13 +129,9 @@ export default function BuildResume() {
   const handleSave = async () => {
     const xml = generateXML();
     try {
-      const res = await fetch('http://localhost:8000/save-resume', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          xml: xml,
-          save_name: resume.save_name
-        })
+      const res = await apiPost('/save-resume', {
+        xml: xml,
+        save_name: resume.save_name
       });
       const data = await res.json();
 

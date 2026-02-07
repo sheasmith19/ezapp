@@ -68,11 +68,35 @@
         "documentation": {}
     },
     {
+        "label": "Depends",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
         "label": "CORSMiddleware",
         "importPath": "fastapi.middleware.cors",
         "description": "fastapi.middleware.cors",
         "isExtraImport": true,
         "detail": "fastapi.middleware.cors",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPBearer",
+        "importPath": "fastapi.security",
+        "description": "fastapi.security",
+        "isExtraImport": true,
+        "detail": "fastapi.security",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPAuthorizationCredentials",
+        "importPath": "fastapi.security",
+        "description": "fastapi.security",
+        "isExtraImport": true,
+        "detail": "fastapi.security",
         "documentation": {}
     },
     {
@@ -94,18 +118,18 @@
     },
     {
         "label": "BuildFromXML",
-        "importPath": "backend.makeresume",
-        "description": "backend.makeresume",
+        "importPath": "makeresume",
+        "description": "makeresume",
         "isExtraImport": true,
-        "detail": "backend.makeresume",
+        "detail": "makeresume",
         "documentation": {}
     },
     {
         "label": "BuildFromXML",
-        "importPath": "backend.makeresume",
-        "description": "backend.makeresume",
+        "importPath": "makeresume",
+        "description": "makeresume",
         "isExtraImport": true,
-        "detail": "backend.makeresume",
+        "detail": "makeresume",
         "documentation": {}
     },
     {
@@ -123,6 +147,22 @@
         "importPath": "xml.etree.ElementTree",
         "description": "xml.etree.ElementTree",
         "detail": "xml.etree.ElementTree",
+        "documentation": {}
+    },
+    {
+        "label": "jwt",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
+        "documentation": {}
+    },
+    {
+        "label": "JWTError",
+        "importPath": "jose",
+        "description": "jose",
+        "isExtraImport": true,
+        "detail": "jose",
         "documentation": {}
     },
     {
@@ -369,6 +409,33 @@
         "documentation": {}
     },
     {
+        "label": "user_dirs",
+        "kind": 2,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "def user_dirs(user_id: str):\n    \"\"\"Return (xml_dir, pdf_dir) for a given Supabase user, creating them if needed.\"\"\"\n    user_dir = os.path.join(BASE_RESUME_DIR, user_id)\n    xml_dir = os.path.join(user_dir, \"xml\")\n    pdf_dir = os.path.join(user_dir, \"pdf\")\n    os.makedirs(xml_dir, exist_ok=True)\n    os.makedirs(pdf_dir, exist_ok=True)\n    return xml_dir, pdf_dir\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData, user_id: str = Depends(get_current_user)):",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "SUPABASE_JWT_SECRET",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "SUPABASE_JWT_SECRET = os.environ.get(\"SUPABASE_JWT_SECRET\", \"your-supabase-jwt-secret\")\nsecurity = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[\"HS256\"], audience=\"authenticated\")\n        user_id = payload.get(\"sub\")\n        if not user_id:\n            raise HTTPException(status_code=401, detail=\"Invalid token: no user ID\")",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "security",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "security = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[\"HS256\"], audience=\"authenticated\")\n        user_id = payload.get(\"sub\")\n        if not user_id:\n            raise HTTPException(status_code=401, detail=\"Invalid token: no user ID\")\n        return user_id",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
         "label": "RESUME_DIR",
         "kind": 5,
         "importPath": "backend.api",
@@ -391,35 +458,35 @@
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "app = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], \n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\nRESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nXML_DIR = os.path.join(RESUME_DIR, \"xml\")",
+        "peekOfCode": "app = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API\napp.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"*\"], \n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)\n# Base resumes directory\nBASE_RESUME_DIR = os.path.join(os.path.expanduser(\"~\"), \"Documents\", \"resumes\")",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "BASE_RESUME_DIR",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "BASE_RESUME_DIR = os.path.join(os.path.expanduser(\"~\"), \"Documents\", \"resumes\")\nos.makedirs(BASE_RESUME_DIR, exist_ok=True)\ndef user_dirs(user_id: str):\n    \"\"\"Return (xml_dir, pdf_dir) for a given Supabase user, creating them if needed.\"\"\"\n    user_dir = os.path.join(BASE_RESUME_DIR, user_id)\n    xml_dir = os.path.join(user_dir, \"xml\")\n    pdf_dir = os.path.join(user_dir, \"pdf\")\n    os.makedirs(xml_dir, exist_ok=True)\n    os.makedirs(pdf_dir, exist_ok=True)\n    return xml_dir, pdf_dir",
         "detail": "backend.api",
         "documentation": {}
     },
     {
         "label": "RESUME_DIR",
         "kind": 5,
-        "importPath": "backend.api",
-        "description": "backend.api",
-        "peekOfCode": "RESUME_DIR = \"/Users/sheasmith/Documents/resumes\"\nXML_DIR = os.path.join(RESUME_DIR, \"xml\")\nPDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\nfor folder in [RESUME_DIR, XML_DIR, PDF_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # Save XML to xml subfolder",
-        "detail": "backend.api",
-        "documentation": {}
-    },
-    {
-        "label": "XML_DIR",
-        "kind": 5,
-        "importPath": "backend.api",
-        "description": "backend.api",
-        "peekOfCode": "XML_DIR = os.path.join(RESUME_DIR, \"xml\")\nPDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\nfor folder in [RESUME_DIR, XML_DIR, PDF_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # Save XML to xml subfolder\n    xml_filename = os.path.join(XML_DIR, save_name + \".xml\")",
-        "detail": "backend.api",
+        "importPath": "backend.gitsave",
+        "description": "backend.gitsave",
+        "peekOfCode": "RESUME_DIR = os.path.join(os.path.expanduser(\"~\"), \"Documents\", \"resumes\")\nPDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\noutputPath = os.path.join(PDF_DIR, \"resume_from_xml.pdf\")\nBuildFromXML(\"resume.xml\", outputPath)\nrepo = git.Repo(RESUME_DIR)\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
+        "detail": "backend.gitsave",
         "documentation": {}
     },
     {
         "label": "PDF_DIR",
         "kind": 5,
-        "importPath": "backend.api",
-        "description": "backend.api",
-        "peekOfCode": "PDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\nfor folder in [RESUME_DIR, XML_DIR, PDF_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n@app.post(\"/save-resume\")\nasync def save_resume(data: ResumeData):\n    save_name = data.save_name.replace(\" \", \"_\")\n    # Save XML to xml subfolder\n    xml_filename = os.path.join(XML_DIR, save_name + \".xml\")\n    # Save PDF to pdf subfolder",
-        "detail": "backend.api",
+        "importPath": "backend.gitsave",
+        "description": "backend.gitsave",
+        "peekOfCode": "PDF_DIR = os.path.join(RESUME_DIR, \"pdf\")\noutputPath = os.path.join(PDF_DIR, \"resume_from_xml.pdf\")\nBuildFromXML(\"resume.xml\", outputPath)\nrepo = git.Repo(RESUME_DIR)\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
+        "detail": "backend.gitsave",
         "documentation": {}
     },
     {
@@ -427,7 +494,7 @@
         "kind": 5,
         "importPath": "backend.gitsave",
         "description": "backend.gitsave",
-        "peekOfCode": "outputPath = \"/Users/sheasmith/Documents/resumes/resume_from_xml.pdf\"\nBuildFromXML(\"resume.xml\", outputPath)\nrepo = git.Repo(\"/Users/sheasmith/Documents/resumes/\")\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
+        "peekOfCode": "outputPath = os.path.join(PDF_DIR, \"resume_from_xml.pdf\")\nBuildFromXML(\"resume.xml\", outputPath)\nrepo = git.Repo(RESUME_DIR)\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
         "detail": "backend.gitsave",
         "documentation": {}
     },
@@ -436,7 +503,7 @@
         "kind": 5,
         "importPath": "backend.gitsave",
         "description": "backend.gitsave",
-        "peekOfCode": "repo = git.Repo(\"/Users/sheasmith/Documents/resumes/\")\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
+        "peekOfCode": "repo = git.Repo(RESUME_DIR)\nrepo.index.add([outputPath])\nrepo.index.commit(\"Update resume_from_xml.pdf\")\norigin = repo.remote(name=\"origin\")\norigin.push()",
         "detail": "backend.gitsave",
         "documentation": {}
     },
@@ -527,6 +594,15 @@
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
         "peekOfCode": "def BuildFromXML(xml_path: str, output_path: str):\n    doc = SimpleDocTemplate(\n    output_path,\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\n    story = []",
+        "detail": "backend.makeresume",
+        "documentation": {}
+    },
+    {
+        "label": "ROOT_DIR",
+        "kind": 5,
+        "importPath": "backend.makeresume",
+        "description": "backend.makeresume",
+        "peekOfCode": "ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\n# 1. Register the font\n# RegisterFont(internal_name, font_file_path)\npdfmetrics.registerFont(TTFont('Garamond', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-VariableFont_wght.ttf')))\npdfmetrics.registerFont(TTFont('Garamond-I', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf')))\nstyles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Garamond\",\n    fontSize=24,",
         "detail": "backend.makeresume",
         "documentation": {}
     },

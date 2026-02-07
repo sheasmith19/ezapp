@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { apiGet, apiDelete } from '../utils/api';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Dashboard() {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchResumes();
@@ -11,7 +14,7 @@ export default function Dashboard() {
 
   const fetchResumes = async () => {
     try {
-      const res = await fetch('http://localhost:8000/list-resumes');
+      const res = await apiGet('/list-resumes');
       const data = await res.json();
       setResumes(data.resumes);
     } catch (err) {
@@ -23,9 +26,7 @@ export default function Dashboard() {
 
   const handleDelete = async (resumeName) => {
     try {
-      const res = await fetch(`http://localhost:8000/delete-resume/${resumeName}`, {
-        method: 'DELETE'
-      });
+      const res = await apiDelete(`/delete-resume/${resumeName}`);
 
       const data = await res.json();
 
@@ -42,7 +43,7 @@ export default function Dashboard() {
   return (
     <div style={{ padding: '40px', fontFamily: 'sans-serif' }}>
       <header style={{ borderBottom: '2px solid #eee', marginBottom: '20px' }}>
-        <h1>User Dashboard</h1>
+        <h1>{user?.email}'s Dashboard</h1>
       </header>
       
       <section>
