@@ -35,8 +35,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
   if (msg.action === 'fetch-resume') {
     const downloadUrl = msg.downloadUrl;
+    const token = msg.token; // Auth token from popup
     console.log('Background: fetching resume', downloadUrl);
-    fetch(downloadUrl)
+    
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    fetch(downloadUrl, { headers })
       .then((resp) => {
         if (!resp.ok) throw new Error('Download failed: ' + resp.status);
         const contentType = resp.headers.get('content-type') || 'application/pdf';

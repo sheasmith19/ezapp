@@ -1,6 +1,7 @@
 import { supabase } from './supabaseClient';
 
-const API_BASE = 'http://localhost:8000';
+// Use /api prefix which Vite proxies to localhost:8000
+const API_BASE = '/api';
 
 /**
  * Get the current Supabase access token (JWT) to send to our backend.
