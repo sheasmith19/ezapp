@@ -43,6 +43,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if(!msg || msg.action !== 'upload') return false;
   
   const downloadUrl = msg.downloadUrl;
+  const token = msg.token; // Auth token passed from popup
   
   // Wrap async logic so we can return true immediately to keep port open
   (async () => {
@@ -50,7 +51,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       console.log('Fetching resume from:', downloadUrl);
       
       // Ask background script to fetch (bypasses page CSP)
-      chrome.runtime.sendMessage({ action: 'fetch-resume', downloadUrl }, async (bgResp) => {
+      chrome.runtime.sendMessage({ action: 'fetch-resume', downloadUrl, token }, async (bgResp) => {
         if (!bgResp || !bgResp.ok) {
           console.error('Background fetch failed:', bgResp?.error);
           sendResponse({ ok: false, error: bgResp?.error || 'Fetch failed' });

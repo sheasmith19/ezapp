@@ -15,7 +15,7 @@
       font-size: 16px;
       color: #1a73e8;
     }
-    select { 
+    select, input { 
       width: 100%;
       padding: 8px;
       margin-bottom: 12px;
@@ -23,8 +23,9 @@
       border-radius: 4px;
       font-size: 13px;
       background: white;
-      cursor: pointer;
     }
+    select { cursor: pointer; }
+    input::placeholder { color: #999; }
     .button-group {
       display: flex;
       gap: 6px;
@@ -48,18 +49,27 @@
     button:active { 
       background: #e0e0e0;
     }
-    #uploadBtn {
+    #uploadBtn, #loginBtn {
       background: #1a73e8;
       color: white;
       border-color: #1a73e8;
     }
-    #uploadBtn:hover {
+    #uploadBtn:hover, #loginBtn:hover {
       background: #1557b0;
       border-color: #1557b0;
     }
-    #settingsBtn {
+    #settingsBtn, #logoutBtn {
       flex: 0 0 auto;
       padding: 8px 12px;
+    }
+    #logoutBtn {
+      background: #ea4335;
+      color: white;
+      border-color: #ea4335;
+    }
+    #logoutBtn:hover {
+      background: #c5221f;
+      border-color: #c5221f;
     }
     #status { 
       margin-top: 8px;
@@ -81,21 +91,44 @@
       border-left-color: #ea4335;
       color: #ea4335;
     }
+    .hidden { display: none !important; }
+    #userEmail {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 12px;
+      padding: 4px 8px;
+      background: #e8f0fe;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
   <h3>Resume Pro</h3>
   
-  <select id="resumeSelect"></select>
-  
-  <div class="button-group">
-    <button id="refreshBtn">Refresh</button>
-    <button id="uploadBtn">Upload</button>
-    <button id="settingsBtn">Settings</button>
+  <!-- Login View -->
+  <div id="loginView">
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <div class="button-group">
+      <button id="loginBtn">Sign In</button>
+      <button id="settingsBtnLogin">Settings</button>
+    </div>
   </div>
   
-  <div id="status">Loading resumes...</div>
+  <!-- Main View (when logged in) -->
+  <div id="mainView" class="hidden">
+    <div id="userEmail"></div>
+    <select id="resumeSelect"></select>
+    <div class="button-group">
+      <button id="refreshBtn">Refresh</button>
+      <button id="uploadBtn">Upload</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
   
+  <div id="status">Enter credentials to sign in</div>
+  
+  <script src="config.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
