@@ -7,11 +7,23 @@ from pydantic import BaseModel
 from makeresume import BuildFromXML
 from fastapi.responses import FileResponse
 import xml.etree.ElementTree as ET
-from jose import jwt, JWTError
+import jwt
+from jwt import PyJWKClient
+from dotenv import load_dotenv
+import ssl
+import certifi
 
-# ⚠️  Replace with your Supabase JWT secret
-#     Found at: https://supabase.com/dashboard → Project Settings → API → JWT Secret
-SUPABASE_JWT_SECRET = os.environ.get("SUPABASE_JWT_SECRET", "your-supabase-jwt-secret")
+# Load .env from project root
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
+
+# Fix macOS SSL certificate issue
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+
+# Supabase JWKS endpoint for ES256 token verification
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://yypvpoqstsfrfgenjmyo.supabase.co")
+JWKS_URL = f"{SUPABASE_URL}/auth/v1/.well-known/jwks.json"
+jwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)
+print(f"[DEBUG] JWKS URL: {JWKS_URL}")
 
 security = HTTPBearer()
 
@@ -20,12 +32,19 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     """Verify the Supabase JWT and return the user ID (sub claim)."""
     token = credentials.credentials
     try:
-        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=["HS256"], audience="authenticated")
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
+        payload = jwt.decode(
+            token,
+            signing_key.key,
+            algorithms=["ES256"],
+            audience="authenticated",
+        )
         user_id = payload.get("sub")
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token: no user ID")
         return user_id
-    except JWTError as e:
+    except Exception as e:
+        print(f"[DEBUG] JWT decode failed: {e}")
         raise HTTPException(status_code=401, detail=f"Invalid token: {str(e)}")
 
 # Define the paths

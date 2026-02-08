@@ -151,18 +151,45 @@
     },
     {
         "label": "jwt",
-        "importPath": "jose",
-        "description": "jose",
+        "kind": 6,
         "isExtraImport": true,
-        "detail": "jose",
+        "importPath": "jwt",
+        "description": "jwt",
+        "detail": "jwt",
         "documentation": {}
     },
     {
-        "label": "JWTError",
-        "importPath": "jose",
-        "description": "jose",
+        "label": "PyJWKClient",
+        "importPath": "jwt",
+        "description": "jwt",
         "isExtraImport": true,
-        "detail": "jose",
+        "detail": "jwt",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "ssl",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "ssl",
+        "description": "ssl",
+        "detail": "ssl",
+        "documentation": {}
+    },
+    {
+        "label": "certifi",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "certifi",
+        "description": "certifi",
+        "detail": "certifi",
         "documentation": {}
     },
     {
@@ -418,11 +445,38 @@
         "documentation": {}
     },
     {
-        "label": "SUPABASE_JWT_SECRET",
+        "label": "ssl_context",
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "SUPABASE_JWT_SECRET = os.environ.get(\"SUPABASE_JWT_SECRET\", \"your-supabase-jwt-secret\")\nsecurity = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[\"HS256\"], audience=\"authenticated\")\n        user_id = payload.get(\"sub\")\n        if not user_id:\n            raise HTTPException(status_code=401, detail=\"Invalid token: no user ID\")",
+        "peekOfCode": "ssl_context = ssl.create_default_context(cafile=certifi.where())\n# Supabase JWKS endpoint for ES256 token verification\nSUPABASE_URL = os.environ.get(\"SUPABASE_URL\", \"https://yypvpoqstsfrfgenjmyo.supabase.co\")\nJWKS_URL = f\"{SUPABASE_URL}/auth/v1/.well-known/jwks.json\"\njwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)\nprint(f\"[DEBUG] JWKS URL: {JWKS_URL}\")\nsecurity = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "SUPABASE_URL",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "SUPABASE_URL = os.environ.get(\"SUPABASE_URL\", \"https://yypvpoqstsfrfgenjmyo.supabase.co\")\nJWKS_URL = f\"{SUPABASE_URL}/auth/v1/.well-known/jwks.json\"\njwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)\nprint(f\"[DEBUG] JWKS URL: {JWKS_URL}\")\nsecurity = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        signing_key = jwks_client.get_signing_key_from_jwt(token)",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "JWKS_URL",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "JWKS_URL = f\"{SUPABASE_URL}/auth/v1/.well-known/jwks.json\"\njwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)\nprint(f\"[DEBUG] JWKS URL: {JWKS_URL}\")\nsecurity = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        signing_key = jwks_client.get_signing_key_from_jwt(token)\n        payload = jwt.decode(",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
+        "label": "jwks_client",
+        "kind": 5,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "jwks_client = PyJWKClient(JWKS_URL, ssl_context=ssl_context)\nprint(f\"[DEBUG] JWKS URL: {JWKS_URL}\")\nsecurity = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        signing_key = jwks_client.get_signing_key_from_jwt(token)\n        payload = jwt.decode(\n            token,",
         "detail": "backend.api",
         "documentation": {}
     },
@@ -431,7 +485,7 @@
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "security = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[\"HS256\"], audience=\"authenticated\")\n        user_id = payload.get(\"sub\")\n        if not user_id:\n            raise HTTPException(status_code=401, detail=\"Invalid token: no user ID\")\n        return user_id",
+        "peekOfCode": "security = HTTPBearer()\nasync def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:\n    \"\"\"Verify the Supabase JWT and return the user ID (sub claim).\"\"\"\n    token = credentials.credentials\n    try:\n        signing_key = jwks_client.get_signing_key_from_jwt(token)\n        payload = jwt.decode(\n            token,\n            signing_key.key,\n            algorithms=[\"ES256\"],",
         "detail": "backend.api",
         "documentation": {}
     },

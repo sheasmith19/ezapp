@@ -19,9 +19,7 @@ export async function apiGet(path) {
   const headers = await authHeaders();
   const res = await fetch(`${API_BASE}${path}`, { headers });
   if (res.status === 401) {
-    await supabase.auth.signOut();
-    window.location.href = '/login';
-    throw new Error('Session expired');
+    console.error('API 401 on', path, '- token may be invalid');
   }
   return res;
 }
@@ -34,9 +32,7 @@ export async function apiPost(path, body) {
     body: JSON.stringify(body),
   });
   if (res.status === 401) {
-    await supabase.auth.signOut();
-    window.location.href = '/login';
-    throw new Error('Session expired');
+    console.error('API 401 on', path, '- token may be invalid');
   }
   return res;
 }
@@ -48,9 +44,7 @@ export async function apiDelete(path) {
     headers,
   });
   if (res.status === 401) {
-    await supabase.auth.signOut();
-    window.location.href = '/login';
-    throw new Error('Session expired');
+    console.error('API 401 on', path, '- token may be invalid');
   }
   return res;
 }
