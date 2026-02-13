@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiGet, apiPost } from '../utils/api';
+import ResumePreview from './ResumePreview';
 
 export default function BuildResume() {
   const [resume, setResume] = useState({
@@ -362,6 +363,7 @@ export default function BuildResume() {
         <button className="save-btn" onClick={handleSave}>Save to Git & Backend</button>
         
       </div>
+      <ResumePreview resume={resume} margins={margins} />
     </div>
   );
 }

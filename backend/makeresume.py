@@ -16,21 +16,20 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 1. Register the font
 # RegisterFont(internal_name, font_file_path)
-pdfmetrics.registerFont(TTFont('Garamond', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-VariableFont_wght.ttf')))
-pdfmetrics.registerFont(TTFont('Garamond-I', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf')))
+pdfmetrics.registerFont(TTFont('TimesNR', os.path.join(ROOT_DIR, 'fonts/times.ttf')))
 
 styles = getSampleStyleSheet()
 
 styles.add(ParagraphStyle(
     name="Name",
-    fontName="Times-Bold",
+    fontName="TimesNR",
     fontSize=24,
     spaceAfter=18,
 ))
 
 styles.add(ParagraphStyle(
     name="SectionHeader",
-    fontName="Times",
+    fontName="TimesNR",
     fontSize=14,
     textColor=black,
     spaceBefore=0,
@@ -39,13 +38,13 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="JobTitle",
-    fontName="Times",
+    fontName="TimesNR",
     fontSize=12,
 ))
 
 styles.add(ParagraphStyle(
     name="DateLocation",
-    fontName="Times",
+    fontName="TimesNR",
     fontSize=12,
     alignment=TA_RIGHT,
     leading=14
@@ -53,7 +52,7 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="JobMeta",
-    fontName="Times-Italic",
+    fontName="TimesNR",
     fontSize=12,
     textColor=grey,
     spaceBefore =2,
@@ -62,7 +61,7 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="Body",
-    fontName="Times",
+    fontName="TimesNR",
     fontSize=12,
     leading=14,
     spaceAfter=0,
@@ -70,7 +69,7 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="Skills",
-    fontName="Times-Italic",
+    fontName="TimesNR",
     fontSize=12,
 ))
 
@@ -137,7 +136,7 @@ def StyledEduHeader(name: str, degree: str, gpa: str, graduation_date: str, loca
 
 def StyledSkillItem(category: str, items: str, is_first: bool = False):
     spacing = SECTION_SPACING if is_first else 3
-    skill_text = f"<font name=\"Garamond-I\">{category}:</font> {items}"
+    skill_text = f"<i>{category}:</i> {items}"
     return [Spacer(1, spacing), Paragraph(skill_text, styles["Body"])]
 
 def StyledJobHeader(company: str, location: str, duration: str, position: str):

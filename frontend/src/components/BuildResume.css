@@ -14,7 +14,7 @@ html, body, #root {
 }
 
 .form-side {
-  flex: 1; /* Adjust ratio (e.g., 0.8 for smaller form, 1.2 for larger) */
+  flex: 0 0 450px; /* Fixed width for form */
   padding: 2rem;
   overflow-y: auto; /* Only the form scrolls */
   background-color: #312f2f;
