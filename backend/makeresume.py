@@ -23,14 +23,14 @@ styles = getSampleStyleSheet()
 
 styles.add(ParagraphStyle(
     name="Name",
-    fontName="Garamond",
+    fontName="Times-Bold",
     fontSize=24,
     spaceAfter=18,
 ))
 
 styles.add(ParagraphStyle(
     name="SectionHeader",
-    fontName="Garamond",
+    fontName="Times",
     fontSize=14,
     textColor=black,
     spaceBefore=0,
@@ -39,28 +39,30 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="JobTitle",
-    fontName="Garamond",
+    fontName="Times",
     fontSize=12,
 ))
 
 styles.add(ParagraphStyle(
     name="DateLocation",
-    fontName="Garamond",
+    fontName="Times",
     fontSize=12,
-    alignment=TA_RIGHT
+    alignment=TA_RIGHT,
+    leading=14
 ))
 
 styles.add(ParagraphStyle(
     name="JobMeta",
-    fontName="Garamond-I",
+    fontName="Times-Italic",
     fontSize=12,
     textColor=grey,
+    spaceBefore =2,
     spaceAfter=4,
 ))
 
 styles.add(ParagraphStyle(
     name="Body",
-    fontName="Garamond",
+    fontName="Times",
     fontSize=12,
     leading=14,
     spaceAfter=0,
@@ -68,12 +70,12 @@ styles.add(ParagraphStyle(
 
 styles.add(ParagraphStyle(
     name="Skills",
-    fontName="Garamond-I",
+    fontName="Times-Italic",
     fontSize=12,
 ))
 
 
-SECTION_SPACING = 8  # Spacing before section content and between sections
+SECTION_SPACING = 2  # Spacing before section content and between sections
 
 JOB_HEADER_TABLE_STYLE = (TableStyle(
     [("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -146,10 +148,10 @@ def StyledJobHeader(company: str, location: str, duration: str, position: str):
                 Paragraph(f"{duration}<br/>{location}", styles["DateLocation"]),
             ]
         ],
-        colWidths=[None, 1.25 * inch],
+        colWidths=[None, 1.75 * inch],
     )
     header.setStyle(JOB_HEADER_TABLE_STYLE)
-    return [Spacer(1, SECTION_SPACING), header]
+    return [Spacer(1, SECTION_SPACING), header, Spacer(1,4)]
     
     
 def StyledResponsibility(text: str):
@@ -173,19 +175,44 @@ def get_txt(el, tag, default=""):
         return found.text.strip()
     return default
 
-def BuildFromXML(xml_path: str, output_path: str):
-    doc = SimpleDocTemplate(
-    output_path,
-    pagesize=LETTER,
-    rightMargin=0.75 * inch,
-    leftMargin=0.75 * inch,
-    topMargin=0.75 * inch,
-    bottomMargin=0.75 * inch,
-)
-    story = []
+def BuildFromXML(xml_path: str, output_path: str, margins: dict = None):
+    """Build a PDF resume from XML.
     
+    Args:
+        xml_path: Path to the XML file
+        output_path: Path for the output PDF
+        margins: Optional dict with keys 'top', 'bottom', 'left', 'right' (in inches)
+                 If not provided, reads from XML. Defaults to 0.75 inches for all.
+    """
+    # Parse XML first to potentially read margins from it
     tree = ET.parse(xml_path)
     root = tree.getroot()
+    
+    # Read margins from XML if not provided as parameter
+    if margins is None:
+        margins = {}
+        margins_elem = root.find('margins')
+        if margins_elem is not None:
+            margins['top'] = float(get_txt(margins_elem, 'top', '0.75'))
+            margins['bottom'] = float(get_txt(margins_elem, 'bottom', '0.75'))
+            margins['left'] = float(get_txt(margins_elem, 'left', '0.75'))
+            margins['right'] = float(get_txt(margins_elem, 'right', '0.75'))
+    
+    top_margin = margins.get('top', 0.75) * inch
+    bottom_margin = margins.get('bottom', 0.75) * inch
+    left_margin = margins.get('left', 0.75) * inch
+    right_margin = margins.get('right', 0.75) * inch
+    
+    doc = SimpleDocTemplate(
+        output_path,
+        pagesize=LETTER,
+        rightMargin=right_margin,
+        leftMargin=left_margin,
+        topMargin=top_margin,
+        bottomMargin=bottom_margin,
+    )
+    story = []
+    
     for child in root:
         if child.tag == "personal_info":
             name = get_txt(child, "name", "")
@@ -195,14 +222,19 @@ def BuildFromXML(xml_path: str, output_path: str):
             story.append(StyledName(name))
             story.extend(StyledContactInfo(email, phone, location))
         elif child.tag == "education":
-            for institution in child.findall("institution"):
-                story.extend(StyledSectionHeader("Education"))
-                name = get_txt(institution, "name", "")
-                degree = get_txt(institution, "degree", "")
-                gpa = get_txt(institution, "gpa", "")
-                graduation_date = get_txt(institution, "graduation_date", "")
-                location = get_txt(institution, "location", "")
-                story.extend(StyledEduHeader(name, degree, gpa, graduation_date, location))
+            institutions = child.findall("institution")
+            if institutions:
+                story.extend(StyledSectionHeader("EDUCATION"))
+                for i, institution in enumerate(institutions):
+                    name = get_txt(institution, "name", "")
+                    degree = get_txt(institution, "degree", "")
+                    gpa = get_txt(institution, "gpa", "")
+                    graduation_date = get_txt(institution, "graduation_date", "")
+                    location = get_txt(institution, "location", "")
+                    story.extend(StyledEduHeader(name, degree, gpa, graduation_date, location))
+                    # Add spacing between institutions, but not after the last one
+                    if i < len(institutions) - 1:
+                        story.append(Spacer(1, 8))
         elif child.tag == "skills":
             skillgroups = child.findall("skillgroup")
             # Only add Skills section if there are skillgroups with content
@@ -222,14 +254,15 @@ def BuildFromXML(xml_path: str, output_path: str):
                     is_first_skill = False
             
             if has_skills:
-                story.extend(StyledSectionHeader("Skills"))
+                story.extend(StyledSectionHeader("SKILLS"))
                 story.extend(skill_items)
+                story.append(Spacer(1, 4))  # Match spacing after education section
         elif child.tag == "experience":
             jobs = child.findall("job")
             # Only add Experience section if there are jobs
             if jobs:
-                story.extend(StyledSectionHeader("Experience"))
-                for job in jobs:
+                story.extend(StyledSectionHeader("EXPERIENCE"))
+                for i, job in enumerate(jobs):
                     company = get_txt(job, "company", "")
                     location = get_txt(job, "location", "")
                     duration = get_txt(job, "duration", "")
@@ -238,6 +271,9 @@ def BuildFromXML(xml_path: str, output_path: str):
                     responsibilities = job.find("responsibilities")
                     for resp in responsibilities.findall("responsibility"):
                         story.append(StyledResponsibility(resp.text))
+                    # Add spacing between jobs, but not after the last one
+                    if i < len(jobs) - 1:
+                        story.append(Spacer(1, 8))
     
     doc.build(story)
             

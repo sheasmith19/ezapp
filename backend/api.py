@@ -4,6 +4,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 import git
 from pydantic import BaseModel
+from typing import Optional
 from makeresume import BuildFromXML
 from fastapi.responses import FileResponse
 import xml.etree.ElementTree as ET
@@ -51,9 +52,16 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
 RESUME_DIR = "resumes"
 OUTPUT_DIR = "outputs"
 
+class MarginSettings(BaseModel):
+    top: Optional[float] = 0.75
+    bottom: Optional[float] = 0.75
+    left: Optional[float] = 0.75
+    right: Optional[float] = 0.75
+
 class ResumeData(BaseModel):
     xml: str
     save_name: str
+    margins: Optional[MarginSettings] = None
     
 # Create folders if they don't exist
 for folder in [RESUME_DIR, OUTPUT_DIR]:
@@ -100,7 +108,17 @@ async def save_resume(data: ResumeData, user_id: str = Depends(get_current_user)
         with open(xml_filename, "wb") as f:
             f.write(xml_data)
 
-        BuildFromXML(xml_filename, pdf_filename)
+        # Prepare margins dict for BuildFromXML
+        margins_dict = None
+        if data.margins:
+            margins_dict = {
+                'top': data.margins.top,
+                'bottom': data.margins.bottom,
+                'left': data.margins.left,
+                'right': data.margins.right
+            }
+        
+        BuildFromXML(xml_filename, pdf_filename, margins=margins_dict)
 
         # Git commit (optional – skip if not a repo)
         try:
@@ -156,7 +174,7 @@ async def get_resume(resume_name: str, user_id: str = Depends(get_current_user))
         if not os.path.exists(xml_filename):
             raise HTTPException(status_code=404, detail="Resume XML not found")
 
-        with open(xml_filename, 'r') as f:
+        with open(xml_filename, 'r', encoding='utf-8') as f:
             xml_content = f.read()
 
         root = ET.fromstring(xml_content)
@@ -171,7 +189,13 @@ async def get_resume(resume_name: str, user_id: str = Depends(get_current_user))
             },
             "education": [],
             "skills": [],
-            "experience": []
+            "experience": [],
+            "margins": {
+                "top": float(root.findtext('margins/top', '0.75')),
+                "bottom": float(root.findtext('margins/bottom', '0.75')),
+                "left": float(root.findtext('margins/left', '0.75')),
+                "right": float(root.findtext('margins/right', '0.75'))
+            }
         }
 
         for edu in root.findall('education/institution'):

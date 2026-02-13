@@ -10,6 +10,12 @@ export default function BuildResume() {
     skills: [{ category: "", items: [] }],
     experience: []
   });
+  const [margins, setMargins] = useState({
+    top: 0.75,
+    bottom: 0.75,
+    left: 0.75,
+    right: 0.75
+  });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const resumeName = searchParams.get('resume');
@@ -25,6 +31,10 @@ export default function BuildResume() {
             // Convert underscores back to spaces in the name
             data.save_name = data.save_name.replace(/_/g, ' ');
             setResume(data);
+            // Load margins if present
+            if (data.margins) {
+              setMargins(data.margins);
+            }
           } else {
             alert("Failed to load resume");
           }
@@ -123,6 +133,12 @@ export default function BuildResume() {
                   </responsibilities>
                 </job>`).join('')}
               </experience>
+              <margins>
+                <top>${margins.top}</top>
+                <bottom>${margins.bottom}</bottom>
+                <left>${margins.left}</left>
+                <right>${margins.right}</right>
+              </margins>
             </resume>`;
   };
 
@@ -131,7 +147,8 @@ export default function BuildResume() {
     try {
       const res = await apiPost('/save-resume', {
         xml: xml,
-        save_name: resume.save_name
+        save_name: resume.save_name,
+        margins: margins
       });
       const data = await res.json();
 
@@ -155,6 +172,58 @@ export default function BuildResume() {
           <h3>Resume Name</h3>
           <input placeholder="Resume Name" value={resume.save_name} onChange={e => updateName(e.target.value)} />
         </div>
+
+        {/* MARGIN CONTROLS */}
+        <div className="section">
+          <h3>Page Margins (inches)</h3>
+          <div className="margin-controls">
+            <div className="margin-input">
+              <label>Top</label>
+              <input 
+                type="number" 
+                min="0" 
+                max="2" 
+                step="0.05" 
+                value={margins.top} 
+                onChange={e => setMargins({...margins, top: parseFloat(e.target.value) || 0})} 
+              />
+            </div>
+            <div className="margin-input">
+              <label>Bottom</label>
+              <input 
+                type="number" 
+                min="0" 
+                max="2" 
+                step="0.05" 
+                value={margins.bottom} 
+                onChange={e => setMargins({...margins, bottom: parseFloat(e.target.value) || 0})} 
+              />
+            </div>
+            <div className="margin-input">
+              <label>Left</label>
+              <input 
+                type="number" 
+                min="0" 
+                max="2" 
+                step="0.05" 
+                value={margins.left} 
+                onChange={e => setMargins({...margins, left: parseFloat(e.target.value) || 0})} 
+              />
+            </div>
+            <div className="margin-input">
+              <label>Right</label>
+              <input 
+                type="number" 
+                min="0" 
+                max="2" 
+                step="0.05" 
+                value={margins.right} 
+                onChange={e => setMargins({...margins, right: parseFloat(e.target.value) || 0})} 
+              />
+            </div>
+          </div>
+        </div>
+
         {/* PERSONAL INFO */}
         <div className="section">
           <h3>Personal Info</h3>
