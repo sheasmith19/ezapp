@@ -1,3 +1,6 @@
+body.no-select, .no-select * {
+  user-select: none !important;
+}
 .phantom-drop.drop-below {
   border-bottom: 2px solid #4a90d9;
   margin-bottom: 0;
@@ -26,14 +29,29 @@ h3 {
   width: 100vw;
   height: calc(100vh - 49px); /* Account for nav bar height */
   overflow: hidden; /* Prevents the whole page from bouncing */
+  position: relative;
 }
 
 .form-side {
-  flex: 0 0 450px; /* Fixed width for form */
   padding: 2rem;
   overflow-y: auto; /* Only the form scrolls */
   background-color: #312f2f;
   border-right: 1px solid #e0e0e0;
+  min-width: 200px;
+  max-width: 900px;
+  transition: flex-basis 0.15s;
+}
+
+.split-divider {
+  width: 8px;
+  cursor: col-resize;
+  background: #e0e0e0;
+  transition: background 0.2s;
+  z-index: 10;
+  position: relative;
+}
+.split-divider:hover {
+  background: #b0b0b0;
 }
 
 

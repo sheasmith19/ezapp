@@ -132,6 +132,7 @@ export default function BuildResume() {
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = el.scrollHeight + 'px';
+    el.style.overflow = 'hidden';
   }, []);
 
   const removeArrayItem = (section, index) => {
@@ -219,9 +220,36 @@ export default function BuildResume() {
     } catch (err) { alert("Save failed. Is backend running?"); }
   };
 
+  // Split screen resizing state
+  const [formWidth, setFormWidth] = useState(450);
+  const dragging = useRef(false);
+
+  // Mouse event handlers for resizing
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (dragging.current) {
+        e.preventDefault();
+        document.body.classList.add('no-select');
+        const min = 300, max = 800;
+        setFormWidth(Math.min(max, Math.max(min, e.clientX)));
+      }
+    };
+    const handleMouseUp = () => {
+      dragging.current = false;
+      document.body.classList.remove('no-select');
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.body.classList.remove('no-select');
+    };
+  }, []);
+
   return (
     <div className="build-page">
-      <div className="form-side">
+      <div className="form-side" style={{ flex: `0 0 ${formWidth}px`, minWidth: 200, maxWidth: 900 }}>
         <h2>Resume Editor</h2>
 
         {/* RESUME NAME */}
@@ -284,10 +312,10 @@ export default function BuildResume() {
         {/* PERSONAL INFO */}
         <div className="section">
           <h3>Personal Info</h3>
-          <input placeholder="Name" value={resume.personal.name} onChange={e => updatePersonal('name', e.target.value)} />
-          <input placeholder="Email" value={resume.personal.email} onChange={e => updatePersonal('email', e.target.value)} />
-          <input placeholder="Phone" value={resume.personal.phone} onChange={e => updatePersonal('phone', e.target.value)} />
-          <input placeholder="Location" value={resume.personal.location} onChange={e => updatePersonal('location', e.target.value)} />
+          <input placeholder="Name" value={resume.personal.name} onChange={e => updatePersonal('name', e.target.value)} ref={autoResize} />
+          <input placeholder="Email" value={resume.personal.email} onChange={e => updatePersonal('email', e.target.value)} ref={autoResize} />
+          <input placeholder="Phone" value={resume.personal.phone} onChange={e => updatePersonal('phone', e.target.value)} ref={autoResize} />
+          <input placeholder="Location" value={resume.personal.location} onChange={e => updatePersonal('location', e.target.value)} ref={autoResize} />
         </div>
 
         {/* EDUCATION */}
@@ -367,11 +395,13 @@ export default function BuildResume() {
                       placeholder="Institution" 
                       value={edu.institution} 
                       onChange={e => updateArrayItem('education', i, 'institution', e.target.value)} 
+                      ref={autoResize}
                     />
                     <input 
                       placeholder="Degree" 
                       value={edu.degree} 
                       onChange={e => updateArrayItem('education', i, 'degree', e.target.value)} 
+                      ref={autoResize}
                     />
                   </div>
 
@@ -381,16 +411,19 @@ export default function BuildResume() {
                       placeholder="GPA" 
                       value={edu.gpa} 
                       onChange={e => updateArrayItem('education', i, 'gpa', e.target.value)} 
+                      ref={autoResize}
                     />
                     <input 
                       placeholder="Graduation Date (e.g. June 2028)" 
                       value={edu.date} 
                       onChange={e => updateArrayItem('education', i, 'date', e.target.value)} 
+                      ref={autoResize}
                     />
                     <input 
                       placeholder="Location" 
                       value={edu.location} 
                       onChange={e => updateArrayItem('education', i, 'location', e.target.value)} 
+                      ref={autoResize}
                     />
                   </div>
                   
@@ -482,6 +515,7 @@ export default function BuildResume() {
                     updated[groupIdx].category = e.target.value;
                     setResume({ ...resume, skills: updated });
                   }}
+                  ref={autoResize}
                 />
                 
                 <textarea 
@@ -493,6 +527,7 @@ export default function BuildResume() {
                     setResume({ ...resume, skills: updated });
                   }}
                   style={{ marginTop: '8px', minHeight: '60px', width: '100%' }}
+                  ref={autoResize}
                 />
 
                 <button 
@@ -599,7 +634,7 @@ export default function BuildResume() {
                       className={`bullet-textarea ${!res.active ? 'deactivated' : ''}`}
                       value={res.text}
                       rows={1}
-                      ref={(el) => autoResize(el)}
+                      ref={autoResize}
                       onChange={e => {
                         updateResponsibility(jIdx, rIdx, e.target.value);
                         autoResize(e.target);
@@ -622,6 +657,12 @@ export default function BuildResume() {
         <button className="save-btn" onClick={handleSave}>Save to Git & Backend</button>
         
       </div>
+      <div
+        className="split-divider"
+        onMouseDown={() => { dragging.current = true; }}
+        style={{ cursor: 'col-resize', width: 8, background: 'transparent', zIndex: 10 }}
+        title="Drag to resize"
+      />
       <ResumePreview xml={generateXML()} margins={margins} />
     </div>
   );

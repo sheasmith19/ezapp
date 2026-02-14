@@ -26,8 +26,31 @@ function App() {
           alignItems: 'center',
           gap: '15px',
         }}>
-          <Link to="/" style={{ color: '#e94560', textDecoration: 'none', fontWeight: 'bold' }}>Dashboard</Link>
-          <Link to="/build" style={{ color: '#eee', textDecoration: 'none' }}>Build Resume</Link>
+          <Link
+            to="/"
+            style={{
+              color: '#e94560',
+              textDecoration: 'none',
+              fontWeight: 'bold',
+              transition: 'color 0.2s',
+            }}
+            onMouseOver={e => e.target.style.color = '#fff'}
+            onMouseOut={e => e.target.style.color = '#e94560'}
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/build"
+            style={{
+              color: '#e94560',
+              textDecoration: 'none',
+              transition: 'color 0.2s',
+            }}
+            onMouseOver={e => e.target.style.color = '#fff'}
+            onMouseOut={e => e.target.style.color = '#e94560'}
+          >
+            Build Resume
+          </Link>
           <div style={{ flex: 1 }} />
           <span style={{ color: '#aaa', fontSize: '14px' }}>{user.email}</span>
           <button
@@ -40,6 +63,15 @@ function App() {
               borderRadius: '4px',
               cursor: 'pointer',
               fontSize: '13px',
+              transition: 'color 0.2s, background 0.2s',
+            }}
+            onMouseOver={e => {
+              e.target.style.color = '#fff';
+              e.target.style.background = '#e94560';
+            }}
+            onMouseOut={e => {
+              e.target.style.color = '#e94560';
+              e.target.style.background = 'none';
             }}
           >
             Log out
