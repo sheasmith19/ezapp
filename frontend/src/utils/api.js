@@ -38,6 +38,20 @@ export async function apiPost(path, body) {
   return res;
 }
 
+export async function apiPostBlob(path, body) {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...headers },
+    body: JSON.stringify(body),
+  });
+  if (res.status === 401) {
+    console.error('API 401 on', path, '- token may be invalid');
+  }
+  if (!res.ok) throw new Error(`Preview failed: ${res.status}`);
+  return res.blob();
+}
+
 export async function apiDelete(path) {
   const headers = await authHeaders();
   const res = await fetch(`${API_BASE}${path}`, {

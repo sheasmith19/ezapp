@@ -1,136 +1,57 @@
-/* Load Times New Roman font */
-@font-face {
-  font-family: 'TimesNR';
-  src: url('/fonts/times.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-/* Preview container - scrollable area with gray background */
+/* Preview container - fills the right side of the split */
 .preview-container {
   flex: 1;
-  background-color: #525252;
-  padding: 20px;
-  overflow-y: auto;
+  background-color: #3a3a3a;
   display: flex;
-  justify-content: center;
-}
-
-/* The actual resume page - white, letter-size paper */
-.resume-page {
-  width: 8.5in;
-  min-height: 11in;
-  background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  font-family: 'TimesNR', 'Times New Roman', Times, serif;
-  font-size: 12pt;
-  line-height: 1.17; /* ~14pt leading at 12pt font */
-  color: black;
-  box-sizing: border-box;
-}
-
-/* Name - 24pt bold, minimal space after (contact info follows immediately) */
-.resume-name {
-  font-size: 24pt;
-  font-weight: bold;
-  margin-bottom: 0;
-}
-
-/* Contact info - 12pt, 4pt space after */
-.resume-contact {
-  font-size: 12pt;
-  margin-bottom: 4pt;
-}
-
-/* Section header - 14pt, with horizontal rule after */
-.section-header {
-  margin-top: 2pt; /* SECTION_SPACING */
-  font-size: 14pt;
-  margin-bottom: 6pt;
-}
-
-.section-line {
-  height: 0.75pt;
-  background-color: #999999;
-  margin-top: 0;
-}
-
-/* Entry header - two column layout for title/meta and date/location */
-.entry-header {
-  display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  margin-top: 2pt; /* SECTION_SPACING */
+  justify-content: center;
+  position: relative;
+  overflow-y: auto;
 }
 
-.entry-left {
-  flex: 1;
+/* Scrollable page stack */
+.pdf-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 0;
 }
 
-.entry-right {
-  width: 1.5in;
-  text-align: right;
-  font-size: 12pt;
-  line-height: 1.17;
+/* Each rendered page image */
+.pdf-page {
+  width: 95%;
+  max-width: 800px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  background: white;
 }
 
-/* Title (company/institution name) - 12pt bold */
-.entry-title {
-  font-size: 12pt;
-  font-weight: bold;
+/* Loading overlay */
+.preview-loading {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  z-index: 10;
 }
 
-/* Meta (position/degree) - 12pt italic grey */
-.entry-meta {
-  font-size: 12pt;
-  font-style: italic;
-  color: grey;
-  margin-top: 2pt;
-  margin-bottom: 4pt;
+/* Error message */
+.preview-error {
+  color: #ff6b6b;
+  font-size: 14px;
+  text-align: center;
+  padding: 40px;
 }
 
-/* Spacer between entries */
-.entry-spacer {
-  height: 8pt;
-}
-
-/* Skills */
-.skill-item {
-  font-size: 12pt;
-  margin-top: 3pt;
-}
-
-.skill-item.first {
-  margin-top: 2pt; /* SECTION_SPACING for first skill */
-}
-
-.skill-category {
-  font-style: italic;
-}
-
-.skills-spacer {
-  height: 4pt;
-}
-
-/* Responsibilities list */
-.responsibilities {
-  margin: 0;
-  padding-left: 12pt;
-  list-style-type: disc;
-}
-
-.responsibilities li {
-  font-size: 12pt;
-  line-height: 1.17;
-  margin: 0;
-  padding: 0;
-}
-
-.responsibilities li::marker {
-  font-size: 14pt;
-}
-
-/* Job entry spacing */
-.job-entry {
-  margin-bottom: 0;
+/* Placeholder when no content yet */
+.preview-placeholder {
+  color: #999;
+  font-size: 15px;
+  text-align: center;
+  padding: 40px;
 }

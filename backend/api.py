@@ -3,10 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import os
 import git
+import tempfile
 from pydantic import BaseModel
 from typing import Optional
 from makeresume import BuildFromXML
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 import xml.etree.ElementTree as ET
 import jwt
 from jwt import PyJWKClient
@@ -214,7 +215,13 @@ async def get_resume(resume_name: str, user_id: str = Depends(get_current_user))
                 resume_data["skills"].append({"category": category, "items": items})
 
         for job in root.findall('experience/job'):
-            responsibilities = [res.text or '' for res in job.findall('responsibilities/responsibility')]
+            responsibilities = []
+            for res in job.findall('responsibilities/responsibility'):
+                deactivated = res.get('deactivated', 'false') == 'true'
+                responsibilities.append({
+                    "text": res.text or '',
+                    "active": not deactivated
+                })
             resume_data["experience"].append({
                 "company": job.findtext('company', ''),
                 "location": job.findtext('location', ''),
@@ -253,6 +260,45 @@ async def download_resume(resume_name: str, user_id: str = Depends(get_current_u
     response = FileResponse(pdf_filename, media_type='application/pdf', filename=resume_name)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
+
+@app.post("/preview-resume")
+async def preview_resume(data: ResumeData, user_id: str = Depends(get_current_user)):
+    """Generate a PDF preview from XML without saving permanently."""
+    try:
+        # Write XML to a temp file, generate PDF to another temp file
+        with tempfile.NamedTemporaryFile(suffix=".xml", delete=False) as xml_tmp:
+            xml_tmp.write(data.xml.encode("utf-8"))
+            xml_tmp_path = xml_tmp.name
+
+        pdf_tmp_path = xml_tmp_path.replace(".xml", ".pdf")
+
+        margins_dict = None
+        if data.margins:
+            margins_dict = {
+                "top": data.margins.top,
+                "bottom": data.margins.bottom,
+                "left": data.margins.left,
+                "right": data.margins.right,
+            }
+
+        BuildFromXML(xml_tmp_path, pdf_tmp_path, margins=margins_dict)
+
+        with open(pdf_tmp_path, "rb") as f:
+            pdf_bytes = f.read()
+
+        # Clean up temp files
+        os.unlink(xml_tmp_path)
+        os.unlink(pdf_tmp_path)
+
+        return Response(content=pdf_bytes, media_type="application/pdf")
+
+    except Exception as e:
+        # Clean up on error
+        for p in [xml_tmp_path, pdf_tmp_path]:
+            if os.path.exists(p):
+                os.unlink(p)
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn

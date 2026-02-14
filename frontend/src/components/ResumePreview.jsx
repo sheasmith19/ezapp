@@ -1,108 +1,92 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { apiPostBlob } from '../utils/api';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf.mjs';
 import './ResumePreview.css';
 
-export default function ResumePreview({ resume, margins }) {
-  const { personal, education, skills, experience } = resume;
-  
-  // Convert inches to CSS (96 DPI)
-  const marginStyle = {
-    paddingTop: `${margins.top}in`,
-    paddingBottom: `${margins.bottom}in`,
-    paddingLeft: `${margins.left}in`,
-    paddingRight: `${margins.right}in`,
-  };
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.mjs',
+  import.meta.url
+).toString();
 
-  // Filter skills to only show those with content
-  const validSkills = skills.filter(s => s.category && s.items.length > 0);
+export default function ResumePreview({ xml, margins }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [canvases, setCanvases] = useState([]);
+  const debounceRef = useRef(null);
+  const containerRef = useRef(null);
+  const pdfDocRef = useRef(null);
+
+  const renderPdf = useCallback(async (pdfData) => {
+    try {
+      const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+      pdfDocRef.current = pdf;
+      const pages = [];
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const scale = 1.5;
+        const viewport = page.getViewport({ scale });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+        pages.push(canvas.toDataURL());
+      }
+
+      setCanvases(pages);
+    } catch (err) {
+      console.error('PDF render error:', err);
+      setError('Failed to render PDF');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!xml || xml.length < 50) return;
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const blob = await apiPostBlob('/preview-resume', {
+          xml,
+          save_name: 'preview',
+          margins,
+        });
+        const arrayBuffer = await blob.arrayBuffer();
+        await renderPdf(arrayBuffer);
+      } catch (err) {
+        console.error('Preview error:', err);
+        setError('Failed to generate preview');
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [xml, margins, renderPdf]);
 
   return (
-    <div className="preview-container">
-      <div className="resume-page" style={marginStyle}>
-        {/* Personal Info */}
-        {personal.name && (
-          <div className="resume-name">{personal.name}</div>
-        )}
-        <div className="resume-contact">
-          {[personal.email, personal.phone, personal.location]
-            .filter(Boolean)
-            .join(' | ')}
+    <div className="preview-container" ref={containerRef}>
+      {loading && <div className="preview-loading">Generating preview…</div>}
+      {error && <div className="preview-error">{error}</div>}
+      {canvases.length > 0 ? (
+        <div className="pdf-pages">
+          {canvases.map((src, i) => (
+            <img key={i} src={src} className="pdf-page" alt={`Page ${i + 1}`} />
+          ))}
         </div>
-
-        {/* Education */}
-        {education.length > 0 && (
-          <>
-            <div className="section-header">
-              <span>EDUCATION</span>
-              <div className="section-line"></div>
-            </div>
-            {education.map((edu, i) => (
-              <div key={i} className="edu-entry">
-                <div className="entry-header">
-                  <div className="entry-left">
-                    <div className="entry-title">{edu.institution}</div>
-                    <div className="entry-meta">
-                      {[edu.degree, edu.gpa ? `GPA: ${edu.gpa}` : null]
-                        .filter(Boolean)
-                        .join(' | ')}
-                    </div>
-                  </div>
-                  <div className="entry-right">
-                    <div>{edu.date}</div>
-                    <div>{edu.location}</div>
-                  </div>
-                </div>
-                {i < education.length - 1 && <div className="entry-spacer"></div>}
-              </div>
-            ))}
-          </>
-        )}
-
-        {/* Skills */}
-        {validSkills.length > 0 && (
-          <>
-            <div className="section-header">
-              <span>SKILLS</span>
-              <div className="section-line"></div>
-            </div>
-            {validSkills.map((skill, i) => (
-              <div key={i} className={`skill-item ${i === 0 ? 'first' : ''}`}>
-                <span className="skill-category">{skill.category}:</span>{' '}
-                {skill.items.join(', ')}
-              </div>
-            ))}
-            <div className="skills-spacer"></div>
-          </>
-        )}
-
-        {/* Experience */}
-        {experience.length > 0 && (
-          <>
-            <div className="section-header">
-              <span>EXPERIENCE</span>
-              <div className="section-line"></div>
-            </div>
-            {experience.map((job, i) => (
-              <div key={i} className="job-entry">
-                <div className="entry-header">
-                  <div className="entry-left">
-                    <div className="entry-title">{job.company}</div>
-                    <div className="entry-meta">{job.position}</div>
-                  </div>
-                  <div className="entry-right">
-                    <div>{job.duration}</div>
-                    <div>{job.location}</div>
-                  </div>
-                </div>
-                <ul className="responsibilities">
-                  {job.responsibilities.map((resp, rIdx) => (
-                    resp && <li key={rIdx}>{resp}</li>
-                  ))}
-                </ul>
-                {i < experience.length - 1 && <div className="entry-spacer"></div>}
-              </div>
-            ))}
-          </>
-        )}
-      </div>
+      ) : (
+        !loading && !error && (
+          <div className="preview-placeholder">
+            Start filling in the form to see a live PDF preview
+          </div>
+        )
+      )}
     </div>
   );
 }

@@ -269,6 +269,8 @@ def BuildFromXML(xml_path: str, output_path: str, margins: dict = None):
                     story.extend(StyledJobHeader(company, location, duration, position))
                     responsibilities = job.find("responsibilities")
                     for resp in responsibilities.findall("responsibility"):
+                        if resp.get('deactivated', 'false') == 'true':
+                            continue
                         story.append(StyledResponsibility(resp.text))
                     # Add spacing between jobs, but not after the last one
                     if i < len(jobs) - 1:

@@ -109,11 +109,28 @@
         "documentation": {}
     },
     {
+        "label": "tempfile",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "tempfile",
+        "description": "tempfile",
+        "detail": "tempfile",
+        "documentation": {}
+    },
+    {
         "label": "BaseModel",
         "importPath": "pydantic",
         "description": "pydantic",
         "isExtraImport": true,
         "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "Optional",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
         "documentation": {}
     },
     {
@@ -134,6 +151,14 @@
     },
     {
         "label": "FileResponse",
+        "importPath": "fastapi.responses",
+        "description": "fastapi.responses",
+        "isExtraImport": true,
+        "detail": "fastapi.responses",
+        "documentation": {}
+    },
+    {
+        "label": "Response",
         "importPath": "fastapi.responses",
         "description": "fastapi.responses",
         "isExtraImport": true,
@@ -427,11 +452,20 @@
         "documentation": {}
     },
     {
+        "label": "MarginSettings",
+        "kind": 6,
+        "importPath": "backend.api",
+        "description": "backend.api",
+        "peekOfCode": "class MarginSettings(BaseModel):\n    top: Optional[float] = 0.75\n    bottom: Optional[float] = 0.75\n    left: Optional[float] = 0.75\n    right: Optional[float] = 0.75\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str\n    margins: Optional[MarginSettings] = None\n# Create folders if they don't exist",
+        "detail": "backend.api",
+        "documentation": {}
+    },
+    {
         "label": "ResumeData",
         "kind": 6,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "class ResumeData(BaseModel):\n    xml: str\n    save_name: str\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")\napp = FastAPI()\n# Enable CORS so your React app (running on localhost:5173) can talk to this API",
+        "peekOfCode": "class ResumeData(BaseModel):\n    xml: str\n    save_name: str\n    margins: Optional[MarginSettings] = None\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")\napp = FastAPI()",
         "detail": "backend.api",
         "documentation": {}
     },
@@ -494,7 +528,7 @@
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "RESUME_DIR = \"resumes\"\nOUTPUT_DIR = \"outputs\"\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")",
+        "peekOfCode": "RESUME_DIR = \"resumes\"\nOUTPUT_DIR = \"outputs\"\nclass MarginSettings(BaseModel):\n    top: Optional[float] = 0.75\n    bottom: Optional[float] = 0.75\n    left: Optional[float] = 0.75\n    right: Optional[float] = 0.75\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str",
         "detail": "backend.api",
         "documentation": {}
     },
@@ -503,7 +537,7 @@
         "kind": 5,
         "importPath": "backend.api",
         "description": "backend.api",
-        "peekOfCode": "OUTPUT_DIR = \"outputs\"\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str\n# Create folders if they don't exist\nfor folder in [RESUME_DIR, OUTPUT_DIR]:\n    if not os.path.exists(folder):\n        os.makedirs(folder)\n        print(f\"Created folder: {folder}\")\napp = FastAPI()",
+        "peekOfCode": "OUTPUT_DIR = \"outputs\"\nclass MarginSettings(BaseModel):\n    top: Optional[float] = 0.75\n    bottom: Optional[float] = 0.75\n    left: Optional[float] = 0.75\n    right: Optional[float] = 0.75\nclass ResumeData(BaseModel):\n    xml: str\n    save_name: str\n    margins: Optional[MarginSettings] = None",
         "detail": "backend.api",
         "documentation": {}
     },
@@ -611,7 +645,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledSkillItem(category: str, items: str, is_first: bool = False):\n    spacing = SECTION_SPACING if is_first else 3\n    skill_text = f\"<font name=\\\"Garamond-I\\\">{category}:</font> {items}\"\n    return [Spacer(1, spacing), Paragraph(skill_text, styles[\"Body\"])]\ndef StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),",
+        "peekOfCode": "def StyledSkillItem(category: str, items: str, is_first: bool = False):\n    spacing = SECTION_SPACING if is_first else 3\n    skill_text = f\"<i>{category}:</i> {items}\"\n    return [Spacer(1, spacing), Paragraph(skill_text, styles[\"Body\"])]\ndef StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -620,7 +654,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.25 * inch],\n    )",
+        "peekOfCode": "def StyledJobHeader(company: str, location: str, duration: str, position: str):\n    header = Table(\n        [\n            [\n                [Paragraph(f\"<b>{company}</b>\", styles[\"JobTitle\"]), Paragraph(position, styles[\"JobMeta\"])],\n                Paragraph(f\"{duration}<br/>{location}\", styles[\"DateLocation\"]),\n            ]\n        ],\n        colWidths=[None, 1.75 * inch],\n    )",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -638,7 +672,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def get_txt(el, tag, default=\"\"):\n    \"\"\"Safely extracts text or returns an empty string.\"\"\"\n    found = el.find(tag)\n    if found is not None and found.text is not None:\n        return found.text.strip()\n    return default\ndef BuildFromXML(xml_path: str, output_path: str):\n    doc = SimpleDocTemplate(\n    output_path,\n    pagesize=LETTER,",
+        "peekOfCode": "def get_txt(el, tag, default=\"\"):\n    \"\"\"Safely extracts text or returns an empty string.\"\"\"\n    found = el.find(tag)\n    if found is not None and found.text is not None:\n        return found.text.strip()\n    return default\ndef BuildFromXML(xml_path: str, output_path: str, margins: dict = None):\n    \"\"\"Build a PDF resume from XML.\n    Args:\n        xml_path: Path to the XML file",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -647,7 +681,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def BuildFromXML(xml_path: str, output_path: str):\n    doc = SimpleDocTemplate(\n    output_path,\n    pagesize=LETTER,\n    rightMargin=0.75 * inch,\n    leftMargin=0.75 * inch,\n    topMargin=0.75 * inch,\n    bottomMargin=0.75 * inch,\n)\n    story = []",
+        "peekOfCode": "def BuildFromXML(xml_path: str, output_path: str, margins: dict = None):\n    \"\"\"Build a PDF resume from XML.\n    Args:\n        xml_path: Path to the XML file\n        output_path: Path for the output PDF\n        margins: Optional dict with keys 'top', 'bottom', 'left', 'right' (in inches)\n                 If not provided, reads from XML. Defaults to 0.75 inches for all.\n    \"\"\"\n    # Parse XML first to potentially read margins from it\n    tree = ET.parse(xml_path)",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -656,7 +690,7 @@
         "kind": 5,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\n# 1. Register the font\n# RegisterFont(internal_name, font_file_path)\npdfmetrics.registerFont(TTFont('Garamond', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-VariableFont_wght.ttf')))\npdfmetrics.registerFont(TTFont('Garamond-I', os.path.join(ROOT_DIR, 'backend/EB_Garamond/EBGaramond-Italic-VariableFont_wght.ttf')))\nstyles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Garamond\",\n    fontSize=24,",
+        "peekOfCode": "ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))\n# 1. Register the font\n# RegisterFont(internal_name, font_file_path)\npdfmetrics.registerFont(TTFont('TimesNR', os.path.join(ROOT_DIR, 'fonts/times.ttf')))\nstyles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"TimesNR\",\n    fontSize=24,\n    spaceAfter=18,",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -665,7 +699,7 @@
         "kind": 5,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "styles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"Garamond\",\n    fontSize=24,\n    spaceAfter=18,\n))\nstyles.add(ParagraphStyle(\n    name=\"SectionHeader\",\n    fontName=\"Garamond\",",
+        "peekOfCode": "styles = getSampleStyleSheet()\nstyles.add(ParagraphStyle(\n    name=\"Name\",\n    fontName=\"TimesNR\",\n    fontSize=24,\n    spaceAfter=18,\n))\nstyles.add(ParagraphStyle(\n    name=\"SectionHeader\",\n    fontName=\"TimesNR\",",
         "detail": "backend.makeresume",
         "documentation": {}
     },
@@ -674,7 +708,7 @@
         "kind": 5,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "SECTION_SPACING = 8  # Spacing before section content and between sections\nJOB_HEADER_TABLE_STYLE = (TableStyle(\n    [(\"VALIGN\", (0, 0), (-1, -1), \"TOP\"),\n     (\"LEFTPADDING\", (0, 0), (-1, -1), 0),\n     (\"RIGHTPADDING\", (0, 0), (-1, -1), 0),\n     (\"TOPPADDING\", (0, 0), (-1, -1), 0),\n     (\"BOTTOMPADDING\", (0, 0), (-1, -1), 2),\n    ]))\ndoc = SimpleDocTemplate(\n    \"resume.pdf\",",
+        "peekOfCode": "SECTION_SPACING = 2  # Spacing before section content and between sections\nJOB_HEADER_TABLE_STYLE = (TableStyle(\n    [(\"VALIGN\", (0, 0), (-1, -1), \"TOP\"),\n     (\"LEFTPADDING\", (0, 0), (-1, -1), 0),\n     (\"RIGHTPADDING\", (0, 0), (-1, -1), 0),\n     (\"TOPPADDING\", (0, 0), (-1, -1), 0),\n     (\"BOTTOMPADDING\", (0, 0), (-1, -1), 2),\n    ]))\ndoc = SimpleDocTemplate(\n    \"resume.pdf\",",
         "detail": "backend.makeresume",
         "documentation": {}
     },

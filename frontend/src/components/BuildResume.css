@@ -1,3 +1,8 @@
+.phantom-drop.drop-below {
+  border-bottom: 2px solid #4a90d9;
+  margin-bottom: 0;
+  background: transparent;
+}
 /* Remove default browser margins */
 html, body, #root {
   margin: 0;
@@ -6,10 +11,20 @@ html, body, #root {
   width: 100%;
 }
 
+h2 {
+  margin-top: 0;
+  color: #fff;
+}
+
+h3 {
+  margin-bottom: 10px;
+  color: #fff;
+}
+
 .build-page {
   display: flex;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh - 49px); /* Account for nav bar height */
   overflow: hidden; /* Prevents the whole page from bouncing */
 }
 
@@ -31,6 +46,7 @@ input, textarea {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .item-group {
@@ -38,6 +54,40 @@ input, textarea {
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 15px;
+  transition: margin-bottom 0.15s, margin-top 0.15s;
+}
+
+.item-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 8px;
+  padding: 2px 0;
+}
+
+.item-group-header:hover {
+  opacity: 0.7;
+}
+
+.collapse-arrow {
+  font-size: 14px;
+  transition: transform 0.2s;
+  color: #666;
+}
+
+.collapse-arrow.collapsed {
+  transform: rotate(-90deg);
+}
+
+.item-group-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .xml-preview {
@@ -79,4 +129,90 @@ input, textarea {
   width: 100%;
   margin: 0;
   text-align: center;
+}
+
+/* Bullet drag-and-drop rows */
+.bullet-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: flex-start;
+  cursor: grab;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.bullet-row:active {
+  cursor: grabbing;
+}
+
+.bullet-row[draggable]:hover {
+  background: #eee;
+}
+
+.bullet-row.drop-above {
+  border-top: 2px solid #4a90d9;
+  margin-top: -2px;
+}
+
+.bullet-row.drop-below {
+  border-bottom: 2px solid #4a90d9;
+  margin-bottom: -2px;
+}
+
+
+.drop-indicator-line {
+  height: 2px;
+  background: #4a90d9;
+  border-radius: 2px;
+  margin: 0 0 8px 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.drag-handle {
+  display: flex;
+  align-items: center;
+  padding: 6px 2px;
+  color: #999;
+  font-size: 16px;
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  padding: 4px 2px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: auto;
+  margin: 0;
+  border-radius: 0;
+}
+
+.toggle-btn.active {
+  color: #28a745;
+}
+
+.toggle-btn.inactive {
+  color: #999;
+}
+
+.bullet-textarea {
+  flex: 1;
+  resize: none;
+  overflow: hidden;
+  min-height: 36px;
+  line-height: 1.4;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.bullet-textarea.deactivated {
+  opacity: 0.45;
+  background: #f0f0f0;
 }

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { apiGet, apiPost } from '../utils/api';
 import ResumePreview from './ResumePreview';
+import './BuildResume.css';
 
 export default function BuildResume() {
   const [resume, setResume] = useState({
@@ -31,6 +32,15 @@ export default function BuildResume() {
             const data = await res.json();
             // Convert underscores back to spaces in the name
             data.save_name = data.save_name.replace(/_/g, ' ');
+            // Normalize old-format responsibilities (plain strings → {text, active})
+            if (data.experience) {
+              data.experience = data.experience.map(job => ({
+                ...job,
+                responsibilities: (job.responsibilities || []).map(r =>
+                  typeof r === 'string' ? { text: r, active: true } : r
+                )
+              }));
+            }
             setResume(data);
             // Load margins if present
             if (data.margins) {
@@ -62,13 +72,20 @@ export default function BuildResume() {
 
   const updateResponsibility = (jobIdx, resIdx, val) => {
     const updatedExp = [...resume.experience];
-    updatedExp[jobIdx].responsibilities[resIdx] = val;
+    updatedExp[jobIdx].responsibilities[resIdx] = { ...updatedExp[jobIdx].responsibilities[resIdx], text: val };
+    setResume({ ...resume, experience: updatedExp });
+  };
+
+  const toggleResponsibility = (jobIdx, resIdx) => {
+    const updatedExp = [...resume.experience];
+    const r = updatedExp[jobIdx].responsibilities[resIdx];
+    updatedExp[jobIdx].responsibilities[resIdx] = { ...r, active: !r.active };
     setResume({ ...resume, experience: updatedExp });
   };
 
   const addResponsibility = (jobIdx) => {
     const updatedExp = [...resume.experience];
-    updatedExp[jobIdx].responsibilities.push("");
+    updatedExp[jobIdx].responsibilities.push({ text: "", active: true });
     setResume({ ...resume, experience: updatedExp });
   };
 
@@ -77,6 +94,45 @@ export default function BuildResume() {
     updatedExp[jobIdx].responsibilities = updatedExp[jobIdx].responsibilities.filter((_, i) => i !== resIdx);
     setResume({ ...resume, experience: updatedExp });
   };
+
+  const reorderResponsibility = (jobIdx, fromIdx, toIdx) => {
+    const updatedExp = [...resume.experience];
+    const items = [...updatedExp[jobIdx].responsibilities];
+    const [moved] = items.splice(fromIdx, 1);
+    items.splice(toIdx, 0, moved);
+    updatedExp[jobIdx].responsibilities = items;
+    setResume({ ...resume, experience: updatedExp });
+  };
+
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+  const dragJobIdx = useRef(null);
+  const [dropIndicator, setDropIndicator] = useState({ jobIdx: null, position: null });
+
+  const skillDragItem = useRef(null);
+  const skillDragOver = useRef(null);
+  const [skillDropIndicator, setSkillDropIndicator] = useState(null);
+
+  const reorderSection = (section, fromIdx, toIdx) => {
+    const items = [...resume[section]];
+    const [moved] = items.splice(fromIdx, 1);
+    items.splice(toIdx, 0, moved);
+    setResume({ ...resume, [section]: items });
+  };
+  const [collapsed, setCollapsed] = useState({ education: {}, skills: {}, experience: {} });
+
+  const toggleCollapse = (section, index) => {
+    setCollapsed(prev => ({
+      ...prev,
+      [section]: { ...prev[section], [index]: !prev[section][index] }
+    }));
+  };
+
+  const autoResize = useCallback((el) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }, []);
 
   const removeArrayItem = (section, index) => {
     const updated = resume[section].filter((_, i) => i !== index);
@@ -130,7 +186,7 @@ export default function BuildResume() {
                   <duration>${escapeXml(job.duration)}</duration>
                   <position>${escapeXml(job.position)}</position>
                   <responsibilities>
-                    ${job.responsibilities.map(res => `<responsibility>${escapeXml(res)}</responsibility>`).join('')}
+                    ${job.responsibilities.map(res => `<responsibility${!res.active ? ' deactivated="true"' : ''}>${escapeXml(res.text)}</responsibility>`).join('')}
                   </responsibilities>
                 </job>`).join('')}
               </experience>
@@ -237,44 +293,122 @@ export default function BuildResume() {
         {/* EDUCATION */}
         <div className="section">
           <h3>Education</h3>
-          {resume.education.map((edu, i) => (
-            <div key={i} className="item-group">
-              {/* Top Row: Institution and Degree */}
-              <div className="input-grid">
-                <input 
-                  placeholder="Institution" 
-                  value={edu.institution} 
-                  onChange={e => updateArrayItem('education', i, 'institution', e.target.value)} 
-                />
-                <input 
-                  placeholder="Degree" 
-                  value={edu.degree} 
-                  onChange={e => updateArrayItem('education', i, 'degree', e.target.value)} 
-                />
-              </div>
+          {(() => {
+            // Drag state for education
+            const eduDragItem = useRef(null);
+            const eduDragOver = useRef(null);
+            const [eduDropIndicator, setEduDropIndicator] = useState(null);
+            // Reorder function for education
+            const reorderEducation = (fromIdx, toIdx) => {
+              const items = [...resume.education];
+              const [moved] = items.splice(fromIdx, 1);
+              items.splice(toIdx, 0, moved);
+              setResume({ ...resume, education: items });
+            };
+            // Render
+            return resume.education.map((edu, i) => {
+              const showDropAbove = eduDropIndicator && eduDropIndicator.idx === i && eduDropIndicator.dir === 'up';
+              const showDropBelow = eduDropIndicator && eduDropIndicator.idx === i && eduDropIndicator.dir === 'down';
+              const dropLineAbove = showDropAbove ? (
+                <div key={`drop-above-edu-${i}`} className="drop-indicator-line" />
+              ) : null;
+              const dropLineBelow = showDropBelow ? (
+                <div key={`drop-below-edu-${i}`} className="drop-indicator-line" />
+              ) : null;
+              return [
+                dropLineAbove,
+                <div
+                  key={i}
+                  className="item-group"
+                  draggable
+                  onDragStart={e => {
+                    eduDragItem.current = i;
+                    e.dataTransfer.effectAllowed = 'move';
+                  }}
+                  onDragOver={e => {
+                    e.preventDefault();
+                    let dir = 'up';
+                    if (eduDragItem.current !== null && i > eduDragItem.current) dir = 'down';
+                    eduDragOver.current = i;
+                    setEduDropIndicator({ idx: i, dir });
+                  }}
+                  onDragLeave={() => {
+                    if (eduDropIndicator && eduDropIndicator.idx === i) setEduDropIndicator(null);
+                  }}
+                  onDrop={() => {
+                    if (
+                      eduDragItem.current !== null &&
+                      eduDragItem.current !== eduDragOver.current
+                    ) {
+                      let toIdx = eduDragOver.current;
+                      if (eduDropIndicator && eduDropIndicator.dir === 'down') {
+                        toIdx = eduDragOver.current + 1;
+                      }
+                      reorderEducation(eduDragItem.current, toIdx);
+                    }
+                    eduDragItem.current = null;
+                    eduDragOver.current = null;
+                    setEduDropIndicator(null);
+                  }}
+                  onDragEnd={() => {
+                    eduDragItem.current = null;
+                    eduDragOver.current = null;
+                    setEduDropIndicator(null);
+                  }}
+                >
+                  <div className="item-group-header" onClick={() => toggleCollapse('education', i)}>
+                    <span className={`collapse-arrow ${collapsed.education[i] ? 'collapsed' : ''}`}>▾</span>
+                    <span className="item-group-title">{edu.institution || 'Untitled School'}</span>
+                  </div>
+                  {!collapsed.education[i] && <>
+                  {/* Top Row: Institution and Degree */}
+                  <div className="input-grid">
+                    <input 
+                      placeholder="Institution" 
+                      value={edu.institution} 
+                      onChange={e => updateArrayItem('education', i, 'institution', e.target.value)} 
+                    />
+                    <input 
+                      placeholder="Degree" 
+                      value={edu.degree} 
+                      onChange={e => updateArrayItem('education', i, 'degree', e.target.value)} 
+                    />
+                  </div>
 
-              {/* Bottom Row: GPA, Date, and Location */}
-              <div className="input-grid-triple">
-                <input 
-                  placeholder="GPA" 
-                  value={edu.gpa} 
-                  onChange={e => updateArrayItem('education', i, 'gpa', e.target.value)} 
-                />
-                <input 
-                  placeholder="Graduation Date (e.g. June 2028)" 
-                  value={edu.date} 
-                  onChange={e => updateArrayItem('education', i, 'date', e.target.value)} 
-                />
-                <input 
-                  placeholder="Location" 
-                  value={edu.location} 
-                  onChange={e => updateArrayItem('education', i, 'location', e.target.value)} 
-                />
-              </div>
-              
-              <button className="delete-btn" onClick={() => removeArrayItem('education', i)}>Remove School</button>
-            </div>
-              ))}
+                  {/* Bottom Row: GPA, Date, and Location */}
+                  <div className="input-grid-triple">
+                    <input 
+                      placeholder="GPA" 
+                      value={edu.gpa} 
+                      onChange={e => updateArrayItem('education', i, 'gpa', e.target.value)} 
+                    />
+                    <input 
+                      placeholder="Graduation Date (e.g. June 2028)" 
+                      value={edu.date} 
+                      onChange={e => updateArrayItem('education', i, 'date', e.target.value)} 
+                    />
+                    <input 
+                      placeholder="Location" 
+                      value={edu.location} 
+                      onChange={e => updateArrayItem('education', i, 'location', e.target.value)} 
+                    />
+                  </div>
+                  
+                  <button className="delete-btn" onClick={() => removeArrayItem('education', i)}>Remove School</button>
+                  </>
+                  }
+                </div>,
+                dropLineBelow
+              ];
+            });
+          })()}
+          {/* Drop indicator at end of education list */}
+          {(() => {
+            const [eduDropIndicator] = useState(null);
+            return eduDropIndicator && eduDropIndicator.idx === resume.education.length && eduDropIndicator.dir === 'down' && (
+              <div className="drop-indicator-line" key="drop-end-edu" />
+            );
+          })()}
               <button className="add-btn" onClick={() => addArrayItem('education', { institution: "", degree: "", gpa: "", date: "", location: "" })}>
                 + Add School
             </button>
@@ -283,38 +417,101 @@ export default function BuildResume() {
         {/* SKILLS */}
         <div className="section">
           <h3>Skills</h3>
-          {resume.skills.map((skillGroup, groupIdx) => (
-            <div key={groupIdx} className="item-group">
-              <input 
-                placeholder="Category (e.g. Software, Programming)" 
-                value={skillGroup.category}
-                onChange={e => {
-                  const updated = [...resume.skills];
-                  updated[groupIdx].category = e.target.value;
-                  setResume({ ...resume, skills: updated });
+          {resume.skills.map((skillGroup, groupIdx) => {
+            // Render drop indicator above or below
+            const showDropAbove = skillDropIndicator && skillDropIndicator.idx === groupIdx && skillDropIndicator.dir === 'up';
+            const showDropBelow = skillDropIndicator && skillDropIndicator.idx === groupIdx && skillDropIndicator.dir === 'down';
+            const dropLineAbove = showDropAbove ? (
+              <div key={`drop-above-${groupIdx}`} className="drop-indicator-line" />
+            ) : null;
+            const dropLineBelow = showDropBelow ? (
+              <div key={`drop-below-${groupIdx}`} className="drop-indicator-line" />
+            ) : null;
+            return [
+              dropLineAbove,
+              <div
+                key={groupIdx}
+                className="item-group"
+                draggable
+                onDragStart={(e) => {
+                  skillDragItem.current = groupIdx;
+                  e.dataTransfer.effectAllowed = 'move';
                 }}
-              />
-              
-              <textarea 
-                placeholder="List skills (e.g. Onshape, SolidWorks, CATIA)"
-                value={skillGroup.items.join(', ')}
-                onChange={e => {
-                  const updated = [...resume.skills];
-                  updated[groupIdx].items = e.target.value.split(',').map(item => item.trim()).filter(item => item);
-                  setResume({ ...resume, skills: updated });
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  let dir = 'up';
+                  if (skillDragItem.current !== null && groupIdx > skillDragItem.current) dir = 'down';
+                  skillDragOver.current = groupIdx;
+                  setSkillDropIndicator({ idx: groupIdx, dir });
                 }}
-                style={{ marginTop: '8px', minHeight: '60px', width: '100%' }}
-              />
-
-              <button 
-                className="delete-btn" 
-                onClick={() => removeArrayItem('skills', groupIdx)}
-                style={{ marginTop: '8px' }}
+                onDragLeave={() => {
+                  if (skillDropIndicator && skillDropIndicator.idx === groupIdx) setSkillDropIndicator(null);
+                }}
+                onDrop={() => {
+                  if (
+                    skillDragItem.current !== null &&
+                    skillDragItem.current !== skillDragOver.current
+                  ) {
+                    let toIdx = skillDragOver.current;
+                    if (skillDropIndicator && skillDropIndicator.dir === 'down') {
+                      toIdx = skillDragOver.current + 1;
+                    }
+                    reorderSection('skills', skillDragItem.current, toIdx);
+                  }
+                  skillDragItem.current = null;
+                  skillDragOver.current = null;
+                  setSkillDropIndicator(null);
+                }}
+                onDragEnd={() => {
+                  skillDragItem.current = null;
+                  skillDragOver.current = null;
+                  setSkillDropIndicator(null);
+                }}
               >
-                Remove Category
-              </button>
-            </div>
-          ))}
+                <div className="item-group-header" onClick={() => toggleCollapse('skills', groupIdx)}>
+                  <span className="drag-handle" onMouseDown={e => e.stopPropagation()}>⠿</span>
+                  <span className={`collapse-arrow ${collapsed.skills[groupIdx] ? 'collapsed' : ''}`}>▾</span>
+                  <span className="item-group-title">{skillGroup.category || 'Untitled Category'}</span>
+                </div>
+                {!collapsed.skills[groupIdx] && <>
+                <input 
+                  placeholder="Category (e.g. Software, Programming)" 
+                  value={skillGroup.category}
+                  onChange={e => {
+                    const updated = [...resume.skills];
+                    updated[groupIdx].category = e.target.value;
+                    setResume({ ...resume, skills: updated });
+                  }}
+                />
+                
+                <textarea 
+                  placeholder="List skills (e.g. Onshape, SolidWorks, CATIA)"
+                  value={skillGroup.items.join(', ')}
+                  onChange={e => {
+                    const updated = [...resume.skills];
+                    updated[groupIdx].items = e.target.value.split(',').map(item => item.trim()).filter(item => item);
+                    setResume({ ...resume, skills: updated });
+                  }}
+                  style={{ marginTop: '8px', minHeight: '60px', width: '100%' }}
+                />
+
+                <button 
+                  className="delete-btn" 
+                  onClick={() => removeArrayItem('skills', groupIdx)}
+                  style={{ marginTop: '8px' }}
+                >
+                  Remove Category
+                </button>
+                </>
+                }
+              </div>,
+              dropLineBelow
+            ];
+          })}
+          {/* Drop indicator at end of list */}
+          {skillDropIndicator && skillDropIndicator.idx === resume.skills.length && skillDropIndicator.dir === 'down' && (
+            <div className="drop-indicator-line" key="drop-end" />
+          )}
           <button 
             className="add-btn" 
             onClick={() => addArrayItem('skills', { category: "", items: [""] })}
@@ -328,6 +525,11 @@ export default function BuildResume() {
           <h3>Experience</h3>
           {resume.experience.map((job, jIdx) => (
             <div key={jIdx} className="item-group">
+              <div className="item-group-header" onClick={() => toggleCollapse('experience', jIdx)}>
+                <span className={`collapse-arrow ${collapsed.experience[jIdx] ? 'collapsed' : ''}`}>▾</span>
+                <span className="item-group-title">{job.company || 'Untitled Job'}</span>
+              </div>
+              {!collapsed.experience[jIdx] && <>
               <input placeholder="Company" value={job.company} onChange={e => updateArrayItem('experience', jIdx, 'company', e.target.value)} />
               <input placeholder="Position" value={job.position} onChange={e => updateArrayItem('experience', jIdx, 'position', e.target.value)} />
               
@@ -346,8 +548,63 @@ export default function BuildResume() {
               
               <div className="bullets">
                 {job.responsibilities.map((res, rIdx) => (
-                  <div key={rIdx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-                    <textarea value={res} onChange={e => updateResponsibility(jIdx, rIdx, e.target.value)} />
+                  <div
+                    key={rIdx}
+                    className={`bullet-row${
+                      dropIndicator.jobIdx === jIdx && dropIndicator.position === rIdx
+                        ? dragItem.current !== null && rIdx > dragItem.current
+                          ? ' drop-below'
+                          : ' drop-above'
+                        : ''
+                    }`}
+                    draggable
+                    onDragStart={() => {
+                      dragItem.current = rIdx;
+                      dragJobIdx.current = jIdx;
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (dragJobIdx.current === jIdx) {
+                        dragOverItem.current = rIdx;
+                        setDropIndicator({ jobIdx: jIdx, position: rIdx });
+                      }
+                    }}
+                    onDragLeave={() => {
+                      if (dropIndicator.position === rIdx) {
+                        setDropIndicator({ jobIdx: null, position: null });
+                      }
+                    }}
+                    onDrop={() => {
+                      if (dragJobIdx.current === jIdx && dragItem.current !== dragOverItem.current) {
+                        reorderResponsibility(jIdx, dragItem.current, dragOverItem.current);
+                      }
+                      dragItem.current = null;
+                      dragOverItem.current = null;
+                      dragJobIdx.current = null;
+                      setDropIndicator({ jobIdx: null, position: null });
+                    }}
+                    onDragEnd={() => {
+                      setDropIndicator({ jobIdx: null, position: null });
+                    }}
+                  >
+                    <span className="drag-handle">⠿</span>
+                    <button
+                      className={`toggle-btn ${res.active ? 'active' : 'inactive'}`}
+                      onClick={() => toggleResponsibility(jIdx, rIdx)}
+                      title={res.active ? 'Deactivate bullet' : 'Activate bullet'}
+                    >
+                      {res.active ? '●' : '○'}
+                    </button>
+                    <textarea
+                      className={`bullet-textarea ${!res.active ? 'deactivated' : ''}`}
+                      value={res.text}
+                      rows={1}
+                      ref={(el) => autoResize(el)}
+                      onChange={e => {
+                        updateResponsibility(jIdx, rIdx, e.target.value);
+                        autoResize(e.target);
+                      }}
+                    />
                     <button className="delete-btn" onClick={() => removeResponsibility(jIdx, rIdx)}>✕</button>
                   </div>
                 ))}
@@ -355,15 +612,17 @@ export default function BuildResume() {
               </div>
 
               <button className="delete-btn" onClick={() => removeArrayItem('experience', jIdx)}>Remove Job</button>
+              </>
+              }
             </div>
           ))}
-          <button onClick={() => addArrayItem('experience', { company: "", location: "", duration: "", position: "", responsibilities: [""] })}>+ Add Job</button>
+          <button onClick={() => addArrayItem('experience', { company: "", location: "", duration: "", position: "", responsibilities: [{ text: "", active: true }] })}>+ Add Job</button>
         </div>
 
         <button className="save-btn" onClick={handleSave}>Save to Git & Backend</button>
         
       </div>
-      <ResumePreview resume={resume} margins={margins} />
+      <ResumePreview xml={generateXML()} margins={margins} />
     </div>
   );
 }
