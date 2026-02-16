@@ -150,11 +150,11 @@ def StyledJobHeader(company: str, location: str, duration: str, position: str):
         colWidths=[None, 1.75 * inch],
     )
     header.setStyle(JOB_HEADER_TABLE_STYLE)
-    return [Spacer(1, SECTION_SPACING), header, Spacer(1,4)]
+    return [Spacer(1, SECTION_SPACING), header]
     
     
 def StyledResponsibility(text: str):
-    return ListFlowable(
+    return [ListFlowable(
             [
                 Paragraph(
                     text,
@@ -165,7 +165,8 @@ def StyledResponsibility(text: str):
             bulletFontName="Helvetica",
             bulletFontSize=14,   # 👈 smaller bullet
             leftIndent=12,     # controls hanging indent
-        )
+        ),
+        Spacer(1, 1)]
 
 def get_txt(el, tag, default=""):
     """Safely extracts text or returns an empty string."""
@@ -271,7 +272,7 @@ def BuildFromXML(xml_path: str, output_path: str, margins: dict = None):
                     for resp in responsibilities.findall("responsibility"):
                         if resp.get('deactivated', 'false') == 'true':
                             continue
-                        story.append(StyledResponsibility(resp.text))
+                        story.extend(StyledResponsibility(resp.text))
                     # Add spacing between jobs, but not after the last one
                     if i < len(jobs) - 1:
                         story.append(Spacer(1, 8))

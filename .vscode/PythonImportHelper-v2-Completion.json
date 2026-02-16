@@ -663,7 +663,7 @@
         "kind": 2,
         "importPath": "backend.makeresume",
         "description": "backend.makeresume",
-        "peekOfCode": "def StyledResponsibility(text: str):\n    return ListFlowable(\n            [\n                Paragraph(\n                    text,\n                    styles[\"Body\"],\n                )\n            ],\n            bulletType=\"bullet\",\n            bulletFontName=\"Helvetica\",",
+        "peekOfCode": "def StyledResponsibility(text: str):\n    return [ListFlowable(\n            [\n                Paragraph(\n                    text,\n                    styles[\"Body\"],\n                )\n            ],\n            bulletType=\"bullet\",\n            bulletFontName=\"Helvetica\",",
         "detail": "backend.makeresume",
         "documentation": {}
     },
