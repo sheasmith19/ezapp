@@ -124,7 +124,7 @@ async def save_resume(data: ResumeData, user_id: str = Depends(get_current_user)
         # Git branch, commit, merge, and push logic
         try:
             repo = git.Repo(BASE_RESUME_DIR)
-            main_branch = 'main'
+            main_branch = 'master'
             new_branch = f"resume-update-{save_name}"
 
             # Create new branch from main
