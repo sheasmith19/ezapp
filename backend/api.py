@@ -121,19 +121,35 @@ async def save_resume(data: ResumeData, user_id: str = Depends(get_current_user)
 
         BuildFromXML(xml_filename, pdf_filename, margins=margins_dict)
 
-        # Git commit and push (optional – skip if not a repo)
+        # Git branch, commit, merge, and push logic
         try:
             repo = git.Repo(BASE_RESUME_DIR)
+            main_branch = 'main'
+            new_branch = f"resume-update-{save_name}"
+
+            # Create new branch from main
+            repo.git.checkout(main_branch)
+            repo.git.pull('origin', main_branch)
+            if new_branch in repo.heads:
+                repo.delete_head(new_branch, force=True)
+            repo.git.checkout('-b', new_branch)
+
+            # Add and commit changes
             repo.index.add([os.path.abspath(pdf_filename), os.path.abspath(xml_filename)])
             repo.index.commit(f"Update resume: {save_name}")
-            # Attempt to push to remote
-            try:
-                origin = repo.remote(name="origin")
-                origin.push()
-            except Exception as push_exc:
-                print(f"[DEBUG] Git push failed: {push_exc}")
+
+            # Checkout main, merge, and push
+            repo.git.checkout(main_branch)
+            repo.git.merge(new_branch)
+            origin = repo.remote(name="origin")
+            origin.push()
+
+            # Optionally delete the feature branch
+            repo.git.branch('-D', new_branch)
         except git.InvalidGitRepositoryError:
             pass
+        except Exception as git_exc:
+            print(f"[DEBUG] Git operation failed: {git_exc}")
 
         return {"status": "success", "message": f"Saved {save_name}"}
 
