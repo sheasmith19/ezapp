@@ -118,14 +118,25 @@ async def save_resume(data: ResumeData, user_id: str = Depends(get_current_user)
                 'left': data.margins.left,
                 'right': data.margins.right
             }
-        
+
         BuildFromXML(xml_filename, pdf_filename, margins=margins_dict)
 
-        # Git commit (optional – skip if not a repo)
+        # Git pull, commit, and push (optional – skip if not a repo)
         try:
             repo = git.Repo(BASE_RESUME_DIR)
+            origin = repo.remote(name="origin")
+            # Pull latest changes before committing
+            try:
+                origin.pull(rebase=True)
+            except Exception as pull_exc:
+                print(f"[DEBUG] Git pull failed: {pull_exc}")
             repo.index.add([os.path.abspath(pdf_filename), os.path.abspath(xml_filename)])
             repo.index.commit(f"Update resume: {save_name}")
+            # Attempt to push to remote
+            try:
+                origin.push()
+            except Exception as push_exc:
+                print(f"[DEBUG] Git push failed: {push_exc}")
         except git.InvalidGitRepositoryError:
             pass
 
