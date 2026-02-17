@@ -1,5 +1,5 @@
-# macOS
-.DS_Store
+*.DS_Store
+*.pyc
 
 # Node
 node_modules
