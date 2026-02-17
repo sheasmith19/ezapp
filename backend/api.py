@@ -144,8 +144,8 @@ async def save_resume(data: ResumeData, user_id: str = Depends(get_current_user)
             origin = repo.remote(name="origin")
             origin.push()
 
-            # # Optionally delete the feature branch
-            # repo.git.branch('-D', new_branch)
+            # Optionally delete the feature branch
+            repo.git.branch('-D', new_branch)
         except git.InvalidGitRepositoryError:
             pass
         except Exception as git_exc:
